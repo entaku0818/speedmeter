@@ -6,16 +6,96 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct ContentView: View {
+    @StateObject private var locationManager = LocationManager()
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Spacer()
+
+                // Speed display
+                VStack(spacing: 8) {
+                    Text(String(format: "%.0f", locationManager.speedKmh))
+                        .font(.system(size: 120, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .monospacedDigit()
+
+                    Text("km/h")
+                        .font(.title)
+                        .foregroundColor(.gray)
+                }
+
+                Spacer()
+
+                // Status and controls
+                VStack(spacing: 16) {
+                    statusView
+
+                    Button(action: {
+                        if locationManager.isTracking {
+                            locationManager.stopTracking()
+                        } else {
+                            if locationManager.authorizationStatus == .notDetermined {
+                                locationManager.requestPermission()
+                            } else {
+                                locationManager.startTracking()
+                            }
+                        }
+                    }) {
+                        Text(locationManager.isTracking ? "Stop" : "Start")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .frame(width: 200, height: 50)
+                            .background(locationManager.isTracking ? Color.red : Color.blue)
+                            .cornerRadius(25)
+                    }
+                }
+                .padding(.bottom, 50)
+            }
         }
-        .padding()
+        .onReceive(locationManager.$authorizationStatus) { status in
+            if status == .authorizedWhenInUse || status == .authorizedAlways {
+                if !locationManager.isTracking {
+                    locationManager.startTracking()
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var statusView: some View {
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            Text("Tap Start to begin")
+                .foregroundColor(.gray)
+        case .denied, .restricted:
+            Text("Location access denied. Please enable in Settings.")
+                .foregroundColor(.red)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        case .authorizedWhenInUse, .authorizedAlways:
+            if locationManager.isTracking {
+                HStack {
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 10, height: 10)
+                    Text("GPS Active")
+                        .foregroundColor(.green)
+                }
+            } else {
+                Text("Ready")
+                    .foregroundColor(.gray)
+            }
+        @unknown default:
+            EmptyView()
+        }
     }
 }
 
