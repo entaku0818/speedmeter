@@ -10,6 +10,7 @@ import CoreLocation
 
 struct ContentView: View {
     @StateObject private var locationManager = LocationManager()
+    @State private var showingSettings = false
 
     var body: some View {
         ZStack {
@@ -17,6 +18,18 @@ struct ContentView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
+                HStack {
+                    Spacer()
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                }
+
                 Spacer()
 
                 // Speed display
@@ -66,6 +79,9 @@ struct ContentView: View {
                     locationManager.startTracking()
                 }
             }
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
         }
     }
 
