@@ -400,7 +400,7 @@
 				DEVELOPMENT_TEAM = 4YZQY4C47E;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "GPS Speedmeter";
+				INFOPLIST_KEY_CFBundleDisplayName = Speedmeter;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to display your current speed, even in the background.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to display your current speed.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -436,7 +436,7 @@
 				DEVELOPMENT_TEAM = 4YZQY4C47E;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "GPS Speedmeter";
+				INFOPLIST_KEY_CFBundleDisplayName = Speedmeter;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to display your current speed, even in the background.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to display your current speed.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
