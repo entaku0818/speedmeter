@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>DSEG7Modern-Bold.ttf</string>
+		<string>DSEG7Classic-Bold.ttf</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>Speedmeter</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location to display your current speed.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app uses your location to display your current speed, even in the background.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
+</dict>
+</plist>
