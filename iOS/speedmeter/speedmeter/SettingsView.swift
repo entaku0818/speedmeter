@@ -6,9 +6,51 @@
 //
 
 import SwiftUI
+import Combine
+
+enum SpeedFont: String, CaseIterable, Identifiable {
+    case system = "system"
+    case digital7Modern = "DSEG7Modern-Bold"
+    case digital7Classic = "DSEG7Classic-Bold"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .system: return "System"
+        case .digital7Modern: return "Digital Modern"
+        case .digital7Classic: return "Digital Classic"
+        }
+    }
+
+    func font(size: CGFloat) -> Font {
+        switch self {
+        case .system:
+            return .system(size: size, weight: .bold, design: .monospaced)
+        case .digital7Modern, .digital7Classic:
+            return .custom(rawValue, size: size)
+        }
+    }
+}
+
+class FontSettings: ObservableObject {
+    static let shared = FontSettings()
+
+    @Published var selectedFont: SpeedFont {
+        didSet {
+            UserDefaults.standard.set(selectedFont.rawValue, forKey: "selectedSpeedFont")
+        }
+    }
+
+    private init() {
+        let saved = UserDefaults.standard.string(forKey: "selectedSpeedFont") ?? SpeedFont.digital7Modern.rawValue
+        self.selectedFont = SpeedFont(rawValue: saved) ?? .digital7Modern
+    }
+}
 
 struct SettingsView: View {
     @ObservedObject private var historyStore = LocationHistoryStore.shared
+    @ObservedObject private var fontSettings = FontSettings.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showingClearAlert = false
 
@@ -22,6 +64,30 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    ForEach(SpeedFont.allCases) { font in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(font.displayName)
+                                Text("123")
+                                    .font(font.font(size: 24))
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            if fontSettings.selectedFont == font {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            fontSettings.selectedFont = font
+                        }
+                    }
+                } header: {
+                    Text("Speed Font")
+                }
+
                 Section {
                     if historyStore.records.isEmpty {
                         Text("No location history")

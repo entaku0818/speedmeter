@@ -10,6 +10,7 @@ import CoreLocation
 
 struct ContentView: View {
     @StateObject private var locationManager = LocationManager()
+    @ObservedObject private var fontSettings = FontSettings.shared
     @State private var showingSettings = false
 
     var body: some View {
@@ -35,9 +36,8 @@ struct ContentView: View {
                 // Speed display
                 VStack(spacing: 8) {
                     Text(String(format: "%.0f", locationManager.speedKmh))
-                        .font(.system(size: 120, weight: .bold, design: .rounded))
+                        .font(fontSettings.selectedFont.font(size: 120))
                         .foregroundColor(.white)
-                        .monospacedDigit()
 
                     Text("km/h")
                         .font(.title)
