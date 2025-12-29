@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  SpeedView.swift
 //  speedmeter
 //
 //  Created by 遠藤拓弥 on 2025/12/13.
@@ -8,8 +8,8 @@
 import SwiftUI
 import CoreLocation
 
-struct ContentView: View {
-    @StateObject private var locationManager = LocationManager()
+struct SpeedView: View {
+    @ObservedObject var locationManager: LocationManager
     @ObservedObject private var fontSettings = FontSettings.shared
     @State private var showingSettings = false
 
@@ -71,10 +71,6 @@ struct ContentView: View {
                     }
                 }
                 .padding(.bottom, 20)
-
-                // バナー広告
-                BannerAdView()
-                    .frame(height: 50)
             }
         }
         .onReceive(locationManager.$authorizationStatus) { status in
@@ -120,5 +116,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    SpeedView(locationManager: LocationManager())
 }
