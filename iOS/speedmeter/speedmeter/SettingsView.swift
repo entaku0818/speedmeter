@@ -52,14 +52,6 @@ struct SettingsView: View {
     @ObservedObject private var historyStore = LocationHistoryStore.shared
     @ObservedObject private var fontSettings = FontSettings.shared
     @Environment(\.dismiss) private var dismiss
-    @State private var showingClearAlert = false
-
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .medium
-        return formatter
-    }()
 
     var body: some View {
         NavigationStack {
@@ -89,37 +81,14 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    if historyStore.records.isEmpty {
-                        Text("No location history")
-                            .foregroundColor(.secondary)
-                    } else {
-                        ForEach(historyStore.records) { record in
-                            LocationRecordRow(record: record, dateFormatter: dateFormatter)
-                        }
-                        .onDelete { offsets in
-                            historyStore.deleteRecord(at: offsets)
-                        }
-                    }
-                } header: {
-                    HStack {
-                        Text("Location History")
-                        Spacer()
-                        Text("\(historyStore.records.count) records")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-
-                if !historyStore.records.isEmpty {
-                    Section {
-                        Button(role: .destructive) {
-                            showingClearAlert = true
-                        } label: {
-                            HStack {
-                                Spacer()
-                                Text("Clear All History")
-                                Spacer()
-                            }
+                    NavigationLink {
+                        LocationHistoryView()
+                    } label: {
+                        HStack {
+                            Text("Location History")
+                            Spacer()
+                            Text("\(historyStore.records.count) records")
+                                .foregroundColor(.secondary)
                         }
                     }
                 }
@@ -133,14 +102,58 @@ struct SettingsView: View {
                     }
                 }
             }
-            .alert("Clear History", isPresented: $showingClearAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Clear", role: .destructive) {
-                    historyStore.clearHistory()
+        }
+    }
+}
+
+struct LocationHistoryView: View {
+    @ObservedObject private var historyStore = LocationHistoryStore.shared
+    @State private var showingClearAlert = false
+
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .medium
+        return formatter
+    }()
+
+    var body: some View {
+        List {
+            if historyStore.records.isEmpty {
+                Text("No location history")
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(historyStore.records) { record in
+                    LocationRecordRow(record: record, dateFormatter: dateFormatter)
                 }
-            } message: {
-                Text("Are you sure you want to delete all location history? This action cannot be undone.")
+                .onDelete { offsets in
+                    historyStore.deleteRecord(at: offsets)
+                }
             }
+
+            if !historyStore.records.isEmpty {
+                Section {
+                    Button(role: .destructive) {
+                        showingClearAlert = true
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text("Clear All History")
+                            Spacer()
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Location History")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Clear History", isPresented: $showingClearAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Clear", role: .destructive) {
+                historyStore.clearHistory()
+            }
+        } message: {
+            Text("Are you sure you want to delete all location history? This action cannot be undone.")
         }
     }
 }

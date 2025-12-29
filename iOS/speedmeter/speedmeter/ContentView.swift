@@ -84,7 +84,7 @@ struct ContentView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingSettings) {
+        .fullScreenCover(isPresented: $showingSettings) {
             SettingsView()
         }
     }
