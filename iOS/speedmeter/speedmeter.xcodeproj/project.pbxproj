@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		612A21632F0214E000818755 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 612A21622F0214E000818755 /* GoogleMobileAds */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		613BE0D22EED2A4200B60D97 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				612A21632F0214E000818755 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +130,7 @@
 			);
 			name = speedmeter;
 			packageProductDependencies = (
+				612A21622F0214E000818755 /* GoogleMobileAds */,
 			);
 			productName = speedmeter;
 			productReference = 613BE0C42EED2A4000B60D97 /* speedmeter.app */;
@@ -208,6 +214,9 @@
 			);
 			mainGroup = 613BE0BB2EED2A4000B60D97;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				612A21612F0214E000818755 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 613BE0C52EED2A4000B60D97 /* Products */;
 			projectDirPath = "";
@@ -284,6 +293,8 @@
 /* Begin XCBuildConfiguration section */
 		613BE0E32EED2A4200B60D97 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Debug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -348,6 +359,8 @@
 		};
 		613BE0E42EED2A4200B60D97 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Release.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -405,6 +418,8 @@
 		};
 		613BE0E62EED2A4200B60D97 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Debug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -438,6 +453,8 @@
 		};
 		613BE0E72EED2A4200B60D97 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Release.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -471,6 +488,8 @@
 		};
 		613BE0E92EED2A4200B60D97 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Debug.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -493,6 +512,8 @@
 		};
 		613BE0EA2EED2A4200B60D97 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Release.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -515,6 +536,8 @@
 		};
 		613BE0EC2EED2A4200B60D97 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Release.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -535,6 +558,8 @@
 		};
 		613BE0ED2EED2A4200B60D97 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 613BE0C62EED2A4000B60D97 /* speedmeter */;
+			baseConfigurationReferenceRelativePath = Config/Release.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -593,6 +618,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		612A21612F0214E000818755 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		612A21622F0214E000818755 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 612A21612F0214E000818755 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 613BE0BC2EED2A4000B60D97 /* Project object */;
 }

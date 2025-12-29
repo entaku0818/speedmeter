@@ -1,0 +1,5 @@
+// Release.xcconfig
+// 本番用AdMob ID
+
+ADMOB_APP_ID = ca-app-pub-3484697221349891~3312246314
+ADMOB_BANNER_ID = ca-app-pub-3484697221349891/3499130339

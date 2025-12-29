@@ -70,7 +70,11 @@ struct ContentView: View {
                             .cornerRadius(25)
                     }
                 }
-                .padding(.bottom, 50)
+                .padding(.bottom, 20)
+
+                // バナー広告
+                BannerAdView()
+                    .frame(height: 50)
             }
         }
         .onReceive(locationManager.$authorizationStatus) { status in
