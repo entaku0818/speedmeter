@@ -53,6 +53,7 @@ struct SettingsView: View {
     @ObservedObject private var historyStore = LocationHistoryStore.shared
     @ObservedObject private var fontSettings = FontSettings.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var showingScreenshotMode = false
 
     var body: some View {
         NavigationStack {
@@ -112,8 +113,21 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("Debug: Simulate Speed")
+                }
+
+                Section {
+                    Button {
+                        showingScreenshotMode = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "camera.viewfinder")
+                            Text("Screenshot Mode")
+                        }
+                    }
+                } header: {
+                    Text("Debug: Screenshots")
                 } footer: {
-                    Text("This section only appears in debug builds")
+                    Text("Open mock screens for App Store screenshots")
                 }
                 #endif
             }
@@ -126,6 +140,11 @@ struct SettingsView: View {
                     }
                 }
             }
+            #if DEBUG
+            .fullScreenCover(isPresented: $showingScreenshotMode) {
+                ScreenshotMockView()
+            }
+            #endif
         }
     }
 }
