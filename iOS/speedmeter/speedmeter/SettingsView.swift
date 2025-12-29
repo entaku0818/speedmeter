@@ -49,6 +49,7 @@ class FontSettings: ObservableObject {
 }
 
 struct SettingsView: View {
+    @ObservedObject var locationManager: LocationManager
     @ObservedObject private var historyStore = LocationHistoryStore.shared
     @ObservedObject private var fontSettings = FontSettings.shared
     @Environment(\.dismiss) private var dismiss
@@ -92,6 +93,29 @@ struct SettingsView: View {
                         }
                     }
                 }
+
+                #if DEBUG
+                Section {
+                    ForEach(SimulatedSpeed.allCases) { speed in
+                        HStack {
+                            Text(speed.rawValue)
+                            Spacer()
+                            if locationManager.simulatedSpeed == speed {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            locationManager.simulatedSpeed = speed
+                        }
+                    }
+                } header: {
+                    Text("Debug: Simulate Speed")
+                } footer: {
+                    Text("This section only appears in debug builds")
+                }
+                #endif
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -196,5 +220,5 @@ struct LocationRecordRow: View {
 }
 
 #Preview {
-    SettingsView()
+    SettingsView(locationManager: LocationManager())
 }

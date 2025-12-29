@@ -81,7 +81,7 @@ struct SpeedView: View {
             }
         }
         .fullScreenCover(isPresented: $showingSettings) {
-            SettingsView()
+            SettingsView(locationManager: locationManager)
         }
     }
 
