@@ -27,4 +27,6 @@ fastlane/test_output
 # Secrets
 *.pem
 *.p12
+*.p8
 *.mobileprovision
+fastlane/.env*

@@ -1,0 +1,19 @@
+A simple and easy-to-read GPS speedometer app.
+
+Check your current speed in real-time with a large digital display. Perfect for driving, cycling, running, and more.
+
+Features:
+- Real-time speed display (km/h)
+- Large, easy-to-read digital display
+- 3 font styles (System, Digital Modern, Digital Classic)
+- Location history recording with map view
+- Color-coded pins based on speed (green: slow, yellow: medium, orange: fast, red: very fast)
+- Background recording support
+
+Highlights:
+- Simple and intuitive interface
+- Dark mode optimized black background design
+- Stores up to 1000 location records
+- View your route on Apple Maps
+
+Whether you're driving, cycling, or running, this speedometer app is your perfect companion for tracking your speed on the go.
