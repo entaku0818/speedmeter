@@ -10,28 +10,40 @@ import SwiftUI
 struct MainTabView: View {
     @StateObject private var locationManager = LocationManager()
     @ObservedObject private var purchaseManager = PurchaseManager.shared
+    @ObservedObject private var premiumSettings = PremiumSettings.shared
+
+    private var backgroundColor: Color {
+        purchaseManager.isPremium ? premiumSettings.themeColor.color : .black
+    }
 
     var body: some View {
-        VStack(spacing: 0) {
-            TabView {
-                SpeedView(locationManager: locationManager)
-                    .tabItem {
-                        Image(systemName: "speedometer")
-                        Text("Speed")
-                    }
+        ZStack {
+            backgroundColor
+                .ignoresSafeArea()
 
-                MapTabView(locationManager: locationManager)
-                    .tabItem {
-                        Image(systemName: "map")
-                        Text("Map")
-                    }
-            }
+            VStack(spacing: 0) {
+                TabView {
+                    SpeedView(locationManager: locationManager)
+                        .tabItem {
+                            Image(systemName: "speedometer")
+                            Text("Speed")
+                        }
 
-            if !purchaseManager.isPremium {
-                BannerAdView()
-                    .frame(height: 50)
+                    MapTabView(locationManager: locationManager)
+                        .tabItem {
+                            Image(systemName: "map")
+                            Text("Map")
+                        }
+                }
+
+                if !purchaseManager.isPremium {
+                    BannerAdView()
+                        .frame(height: 50)
+                        .background(Color.black)
+                }
             }
         }
+        .preferredColorScheme(.dark)
     }
 }
 

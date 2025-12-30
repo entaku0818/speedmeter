@@ -229,6 +229,7 @@ struct SettingsView: View {
                 if !purchaseManager.isPremium {
                     BannerAdView()
                         .frame(height: 50)
+                        .background(Color.black)
                 }
             }
             .navigationTitle("Settings")
@@ -249,6 +250,7 @@ struct SettingsView: View {
             }
             #endif
         }
+        .preferredColorScheme(.dark)
     }
 }
 
