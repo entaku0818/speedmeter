@@ -8,10 +8,15 @@
 import SwiftUI
 import GoogleMobileAds
 import RevenueCat
+import FirebaseCore
+import FirebaseCrashlytics
 
 @main
 struct speedmeterApp: App {
     init() {
+        // Firebase初期化
+        FirebaseApp.configure()
+
         // AdMob初期化
         MobileAds.shared.start(completionHandler: nil)
 
