@@ -9,25 +9,56 @@ import SwiftUI
 import Combine
 
 enum SpeedFont: String, CaseIterable, Identifiable {
-    case system = "system"
     case digital7Modern = "DSEG7Modern-Bold"
     case digital7Classic = "DSEG7Classic-Bold"
+    case system = "system"
+    case systemRounded = "systemRounded"
+    case menlo = "Menlo-Bold"
+    case courier = "Courier-Bold"
+    case helveticaNeue = "HelveticaNeue-Bold"
+    case avenir = "AvenirNext-Bold"
+    case futura = "Futura-Bold"
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
         case .system: return "System"
+        case .systemRounded: return "System Rounded"
         case .digital7Modern: return "Digital Modern"
         case .digital7Classic: return "Digital Classic"
+        case .menlo: return "Menlo"
+        case .courier: return "Courier"
+        case .helveticaNeue: return "Helvetica Neue"
+        case .avenir: return "Avenir Next"
+        case .futura: return "Futura"
         }
+    }
+
+    var isPremiumOnly: Bool {
+        switch self {
+        case .digital7Modern, .digital7Classic:
+            return false
+        default:
+            return true
+        }
+    }
+
+    static var freeFonts: [SpeedFont] {
+        allCases.filter { !$0.isPremiumOnly }
+    }
+
+    static var allFontsForPremium: [SpeedFont] {
+        allCases
     }
 
     func font(size: CGFloat) -> Font {
         switch self {
         case .system:
             return .system(size: size, weight: .bold, design: .monospaced)
-        case .digital7Modern, .digital7Classic:
+        case .systemRounded:
+            return .system(size: size, weight: .bold, design: .rounded)
+        case .digital7Modern, .digital7Classic, .menlo, .courier, .helveticaNeue, .avenir, .futura:
             return .custom(rawValue, size: size)
         }
     }
@@ -74,7 +105,7 @@ struct SettingsView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("Proにアップグレード")
                                         .foregroundColor(.primary)
-                                    Text("広告非表示、テーマ変更など")
+                                    Text("広告非表示、フォント・テーマ変更など")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
@@ -90,16 +121,6 @@ struct SettingsView: View {
 
                 // Premium Settings (for Pro users)
                 if purchaseManager.isPremium {
-                    Section {
-                        Picker("履歴保存件数", selection: $premiumSettings.historyLimit) {
-                            ForEach(HistoryLimit.allCases) { limit in
-                                Text(limit.displayName).tag(limit)
-                            }
-                        }
-                    } header: {
-                        Text("履歴設定")
-                    }
-
                     Section {
                         ForEach(ThemeColor.allCases) { theme in
                             HStack {
@@ -124,10 +145,18 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    ForEach(SpeedFont.allCases) { font in
+                    let availableFonts = purchaseManager.isPremium ? SpeedFont.allFontsForPremium : SpeedFont.freeFonts
+                    ForEach(availableFonts) { font in
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(font.displayName)
+                                HStack {
+                                    Text(font.displayName)
+                                    if font.isPremiumOnly {
+                                        Image(systemName: "crown.fill")
+                                            .font(.caption2)
+                                            .foregroundColor(.yellow)
+                                    }
+                                }
                                 Text("123")
                                     .font(font.font(size: 24))
                                     .foregroundColor(.secondary)

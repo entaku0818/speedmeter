@@ -13,7 +13,7 @@ import SwiftUI
 class LocationHistoryStore: ObservableObject {
     @Published private(set) var records: [LocationRecord] = []
 
-    private let maxRecords = 1000
+    private let freeMaxRecords = 1000
     private let saveKey = "locationHistory"
 
     static let shared = LocationHistoryStore()
@@ -25,8 +25,9 @@ class LocationHistoryStore: ObservableObject {
     func addRecord(_ record: LocationRecord) {
         records.insert(record, at: 0)
 
-        if records.count > maxRecords {
-            records = Array(records.prefix(maxRecords))
+        // Pro版は無制限、無料版は1000件まで
+        if !PurchaseManager.shared.isPremium && records.count > freeMaxRecords {
+            records = Array(records.prefix(freeMaxRecords))
         }
 
         save()

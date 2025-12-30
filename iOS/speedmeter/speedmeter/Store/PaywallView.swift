@@ -76,10 +76,10 @@ struct PaywallView: View {
                             )
 
                             FeatureRow(
-                                icon: "clock.arrow.circlepath",
-                                iconColor: .blue,
-                                title: "履歴件数カスタマイズ",
-                                description: "100件〜無制限まで自由に設定"
+                                icon: "textformat",
+                                iconColor: .orange,
+                                title: "フォントカスタマイズ",
+                                description: "7種類の追加フォントから選択"
                             )
 
                             FeatureRow(
@@ -90,10 +90,10 @@ struct PaywallView: View {
                             )
 
                             FeatureRow(
-                                icon: "apps.iphone",
-                                iconColor: .green,
-                                title: "ウィジェット",
-                                description: "ホーム画面に速度を表示（近日公開）"
+                                icon: "infinity",
+                                iconColor: .blue,
+                                title: "履歴無制限",
+                                description: "位置履歴を無制限に保存"
                             )
                         }
                         .padding(.horizontal)

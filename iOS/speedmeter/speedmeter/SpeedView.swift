@@ -11,11 +11,17 @@ import CoreLocation
 struct SpeedView: View {
     @ObservedObject var locationManager: LocationManager
     @ObservedObject private var fontSettings = FontSettings.shared
+    @ObservedObject private var purchaseManager = PurchaseManager.shared
+    @ObservedObject private var premiumSettings = PremiumSettings.shared
     @State private var showingSettings = false
+
+    private var backgroundColor: Color {
+        purchaseManager.isPremium ? premiumSettings.themeColor.color : .black
+    }
 
     var body: some View {
         ZStack {
-            Color.black
+            backgroundColor
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
@@ -83,6 +89,7 @@ struct SpeedView: View {
         .fullScreenCover(isPresented: $showingSettings) {
             SettingsView(locationManager: locationManager)
         }
+        .animation(.easeInOut(duration: 0.3), value: premiumSettings.themeColor)
     }
 
     @ViewBuilder
