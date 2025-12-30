@@ -155,11 +155,24 @@ class PurchaseManager: PurchaseManagerProtocol, ObservableObject {
             let customerInfo = try await Purchases.shared.customerInfo()
             let isActive = customerInfo.entitlements["Speedmeter Premium"]?.isActive == true
             await MainActor.run {
+                let wasPremiun = self.isPremium
                 self.isPremium = isActive
                 UserDefaults.standard.set(isActive, forKey: "hasPurchasedPremium")
+
+                // 解約時（Premium→Free）は設定をリセット
+                if wasPremiun && !isActive {
+                    self.resetSettingsToFree()
+                }
             }
         } catch {
             os_log("Failed to check premium status: %{public}@", log: logger, type: .error, error.localizedDescription)
         }
+    }
+
+    /// 解約時に設定を無料版にリセット
+    private func resetSettingsToFree() {
+        FontSettings.shared.resetToFree()
+        PremiumSettings.shared.resetToFree()
+        os_log("Settings reset to free tier", log: logger, type: .debug)
     }
 }
