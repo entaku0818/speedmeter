@@ -27,6 +27,10 @@ enum ThemeColor: String, CaseIterable, Identifiable {
         }
     }
 
+    var isFree: Bool {
+        self == .black
+    }
+
     var color: Color {
         switch self {
         case .black: return .black
@@ -48,7 +52,13 @@ class PremiumSettings: ObservableObject {
     }
 
     private init() {
+        // デフォルトは無料のブラック
         let savedTheme = UserDefaults.standard.string(forKey: "premiumThemeColor") ?? ThemeColor.black.rawValue
         self.themeColor = ThemeColor(rawValue: savedTheme) ?? .black
+    }
+
+    /// 解約時に無料設定にリセット
+    func resetToFree() {
+        themeColor = .black
     }
 }

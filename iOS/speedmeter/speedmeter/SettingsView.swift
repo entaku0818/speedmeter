@@ -35,21 +35,8 @@ enum SpeedFont: String, CaseIterable, Identifiable {
         }
     }
 
-    var isPremiumOnly: Bool {
-        switch self {
-        case .digital7Modern, .digital7Classic:
-            return false
-        default:
-            return true
-        }
-    }
-
-    static var freeFonts: [SpeedFont] {
-        allCases.filter { !$0.isPremiumOnly }
-    }
-
-    static var allFontsForPremium: [SpeedFont] {
-        allCases
+    var isFree: Bool {
+        self == .digital7Modern
     }
 
     func font(size: CGFloat) -> Font {
@@ -74,8 +61,14 @@ class FontSettings: ObservableObject {
     }
 
     private init() {
+        // デフォルトは無料のDigital Modern
         let saved = UserDefaults.standard.string(forKey: "selectedSpeedFont") ?? SpeedFont.digital7Modern.rawValue
         self.selectedFont = SpeedFont(rawValue: saved) ?? .digital7Modern
+    }
+
+    /// 解約時に無料設定にリセット
+    func resetToFree() {
+        selectedFont = .digital7Modern
     }
 }
 
@@ -105,7 +98,7 @@ struct SettingsView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("Proにアップグレード")
                                         .foregroundColor(.primary)
-                                    Text("広告非表示、フォント・テーマ変更など")
+                                    Text("広告非表示、フォント・テーマ変更、履歴無制限")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
@@ -119,42 +112,47 @@ struct SettingsView: View {
                     }
                 }
 
-                // Premium Settings (for Pro users)
-                if purchaseManager.isPremium {
-                    Section {
-                        ForEach(ThemeColor.allCases) { theme in
-                            HStack {
-                                Circle()
-                                    .fill(theme.color)
-                                    .frame(width: 24, height: 24)
-                                Text(theme.displayName)
-                                Spacer()
-                                if premiumSettings.themeColor == theme {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.blue)
-                                }
+                Section {
+                    ForEach(ThemeColor.allCases) { theme in
+                        HStack {
+                            Circle()
+                                .fill(theme.color)
+                                .frame(width: 24, height: 24)
+                            Text(theme.displayName)
+                            if !theme.isFree && !purchaseManager.isPremium {
+                                Image(systemName: "lock.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
                             }
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                premiumSettings.themeColor = theme
+                            Spacer()
+                            if premiumSettings.themeColor == theme {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
                             }
                         }
-                    } header: {
-                        Text("テーマ")
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if theme.isFree || purchaseManager.isPremium {
+                                premiumSettings.themeColor = theme
+                            } else {
+                                showingPaywall = true
+                            }
+                        }
                     }
+                } header: {
+                    Text("テーマ")
                 }
 
                 Section {
-                    let availableFonts = purchaseManager.isPremium ? SpeedFont.allFontsForPremium : SpeedFont.freeFonts
-                    ForEach(availableFonts) { font in
+                    ForEach(SpeedFont.allCases) { font in
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
                                     Text(font.displayName)
-                                    if font.isPremiumOnly {
-                                        Image(systemName: "crown.fill")
-                                            .font(.caption2)
-                                            .foregroundColor(.yellow)
+                                    if !font.isFree && !purchaseManager.isPremium {
+                                        Image(systemName: "lock.fill")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
                                     }
                                 }
                                 Text("123")
@@ -169,7 +167,11 @@ struct SettingsView: View {
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            fontSettings.selectedFont = font
+                            if font.isFree || purchaseManager.isPremium {
+                                fontSettings.selectedFont = font
+                            } else {
+                                showingPaywall = true
+                            }
                         }
                     }
                 } header: {

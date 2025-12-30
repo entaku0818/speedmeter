@@ -79,14 +79,14 @@ struct PaywallView: View {
                                 icon: "textformat",
                                 iconColor: .orange,
                                 title: "フォントカスタマイズ",
-                                description: "7種類の追加フォントから選択"
+                                description: "8種類の追加フォントから選択"
                             )
 
                             FeatureRow(
                                 icon: "paintpalette.fill",
                                 iconColor: .purple,
                                 title: "テーマカスタマイズ",
-                                description: "5種類の背景テーマから選択"
+                                description: "4種類の追加テーマから選択"
                             )
 
                             FeatureRow(
