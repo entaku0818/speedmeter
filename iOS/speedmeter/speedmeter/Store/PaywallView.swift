@@ -160,6 +160,14 @@ struct PaywallView: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
+
+                        // Legal Links
+                        HStack(spacing: 16) {
+                            Link("プライバシーポリシー", destination: URL(string: "https://speedmeter-f9de0.web.app/privacy.html")!)
+                            Link("利用規約", destination: URL(string: "https://speedmeter-f9de0.web.app/terms.html")!)
+                        }
+                        .font(.caption)
+                        .foregroundColor(.blue)
                         .padding(.bottom, 32)
                     }
                 }
