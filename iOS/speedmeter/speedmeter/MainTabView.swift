@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @StateObject private var locationManager = LocationManager()
+    @ObservedObject private var purchaseManager = PurchaseManager.shared
 
     var body: some View {
         VStack(spacing: 0) {
@@ -26,8 +27,10 @@ struct MainTabView: View {
                     }
             }
 
-            BannerAdView()
-                .frame(height: 50)
+            if !purchaseManager.isPremium {
+                BannerAdView()
+                    .frame(height: 50)
+            }
         }
     }
 }

@@ -52,12 +52,77 @@ struct SettingsView: View {
     @ObservedObject var locationManager: LocationManager
     @ObservedObject private var historyStore = LocationHistoryStore.shared
     @ObservedObject private var fontSettings = FontSettings.shared
+    @ObservedObject private var purchaseManager = PurchaseManager.shared
+    @ObservedObject private var premiumSettings = PremiumSettings.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showingScreenshotMode = false
+    @State private var showingPaywall = false
 
     var body: some View {
         NavigationStack {
-            List {
+            VStack(spacing: 0) {
+                List {
+                // Pro Plan Section
+                if !purchaseManager.isPremium {
+                    Section {
+                        Button {
+                            showingPaywall = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "crown.fill")
+                                    .foregroundColor(.yellow)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Proにアップグレード")
+                                        .foregroundColor(.primary)
+                                    Text("広告非表示、テーマ変更など")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    } header: {
+                        Text("Pro Plan")
+                    }
+                }
+
+                // Premium Settings (for Pro users)
+                if purchaseManager.isPremium {
+                    Section {
+                        Picker("履歴保存件数", selection: $premiumSettings.historyLimit) {
+                            ForEach(HistoryLimit.allCases) { limit in
+                                Text(limit.displayName).tag(limit)
+                            }
+                        }
+                    } header: {
+                        Text("履歴設定")
+                    }
+
+                    Section {
+                        ForEach(ThemeColor.allCases) { theme in
+                            HStack {
+                                Circle()
+                                    .fill(theme.color)
+                                    .frame(width: 24, height: 24)
+                                Text(theme.displayName)
+                                Spacer()
+                                if premiumSettings.themeColor == theme {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                premiumSettings.themeColor = theme
+                            }
+                        }
+                    } header: {
+                        Text("テーマ")
+                    }
+                }
+
                 Section {
                     ForEach(SpeedFont.allCases) { font in
                         HStack {
@@ -130,6 +195,12 @@ struct SettingsView: View {
                     Text("Open mock screens for App Store screenshots")
                 }
                 #endif
+                }
+
+                if !purchaseManager.isPremium {
+                    BannerAdView()
+                        .frame(height: 50)
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -139,6 +210,9 @@ struct SettingsView: View {
                         dismiss()
                     }
                 }
+            }
+            .sheet(isPresented: $showingPaywall) {
+                PaywallView()
             }
             #if DEBUG
             .fullScreenCover(isPresented: $showingScreenshotMode) {

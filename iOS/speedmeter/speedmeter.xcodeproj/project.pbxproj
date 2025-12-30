@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		612A21632F0214E000818755 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 612A21622F0214E000818755 /* GoogleMobileAds */; };
+		612A24462F0296BA00818755 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 612A24452F0296BA00818755 /* RevenueCat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				612A24462F0296BA00818755 /* RevenueCat in Frameworks */,
 				612A21632F0214E000818755 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -131,6 +133,7 @@
 			name = speedmeter;
 			packageProductDependencies = (
 				612A21622F0214E000818755 /* GoogleMobileAds */,
+				612A24452F0296BA00818755 /* RevenueCat */,
 			);
 			productName = speedmeter;
 			productReference = 613BE0C42EED2A4000B60D97 /* speedmeter.app */;
@@ -216,6 +219,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				612A21612F0214E000818755 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				612A24442F0296BA00818755 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 613BE0C52EED2A4000B60D97 /* Products */;
@@ -628,6 +632,14 @@
 				minimumVersion = 12.14.0;
 			};
 		};
+		612A24442F0296BA00818755 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.52.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -635,6 +647,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 612A21612F0214E000818755 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
 			productName = GoogleMobileAds;
+		};
+		612A24452F0296BA00818755 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 612A24442F0296BA00818755 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
