@@ -79,13 +79,6 @@ struct SpeedView: View {
                 .padding(.bottom, 20)
             }
         }
-        .onReceive(locationManager.$authorizationStatus) { status in
-            if status == .authorizedWhenInUse || status == .authorizedAlways {
-                if !locationManager.isTracking {
-                    locationManager.startTracking()
-                }
-            }
-        }
         .fullScreenCover(isPresented: $showingSettings) {
             SettingsView(locationManager: locationManager)
         }
