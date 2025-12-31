@@ -48,3 +48,7 @@ This is a SwiftUI iOS app that displays real-time GPS speed with a digital clock
 
 - Speed simulation (Walking/Running/Cycling/Driving/Highway)
 - Screenshot mode for App Store screenshots (ScreenshotMockView)
+
+## User Commands
+
+- 「進捗どう？」と聞かれたら、完了タスク・残タスク・関連URLをまとめて報告する
