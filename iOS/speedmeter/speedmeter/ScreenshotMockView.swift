@@ -88,7 +88,7 @@ struct MockSpeedView: View {
                 .padding(.bottom, 20)
             }
         }
-        .sheet(isPresented: $showingSettings) {
+        .fullScreenCover(isPresented: $showingSettings) {
             MockSettingsView()
         }
     }
@@ -194,10 +194,34 @@ struct MockMapView: View {
 struct MockSettingsView: View {
     @ObservedObject private var fontSettings = FontSettings.shared
     @ObservedObject private var premiumSettings = PremiumSettings.shared
+    @State private var showingPaywall = false
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    Button {
+                        showingPaywall = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "crown.fill")
+                                .foregroundColor(.yellow)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Proにアップグレード")
+                                    .foregroundColor(.primary)
+                                Text("広告非表示、フォント・テーマ変更、履歴無制限")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                } header: {
+                    Text("Pro Plan")
+                }
+
                 Section {
                     HStack {
                         Circle()
@@ -243,6 +267,9 @@ struct MockSettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView()
         }
     }
 }
