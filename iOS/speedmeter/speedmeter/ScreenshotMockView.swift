@@ -192,6 +192,7 @@ struct MockMapView: View {
 
 // MARK: - Mock Settings View
 struct MockSettingsView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject private var fontSettings = FontSettings.shared
     @ObservedObject private var premiumSettings = PremiumSettings.shared
     @State private var showingPaywall = false
@@ -267,6 +268,13 @@ struct MockSettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
         }
         .fullScreenCover(isPresented: $showingPaywall) {
             PaywallView()
