@@ -34,6 +34,7 @@ struct ScreenshotMockView: View {
 // MARK: - Mock Speed View
 struct MockSpeedView: View {
     @ObservedObject private var fontSettings = FontSettings.shared
+    @State private var showingSettings = false
 
     var body: some View {
         ZStack {
@@ -43,10 +44,14 @@ struct MockSpeedView: View {
             VStack(spacing: 20) {
                 HStack {
                     Spacer()
-                    Image(systemName: "gearshape.fill")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding()
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding()
+                    }
                 }
 
                 Spacer()
@@ -82,6 +87,9 @@ struct MockSpeedView: View {
                 }
                 .padding(.bottom, 20)
             }
+        }
+        .sheet(isPresented: $showingSettings) {
+            MockSettingsView()
         }
     }
 }
@@ -178,6 +186,120 @@ struct MockMapView: View {
             return .orange
         default:
             return .red
+        }
+    }
+}
+
+// MARK: - Mock Settings View
+struct MockSettingsView: View {
+    @ObservedObject private var fontSettings = FontSettings.shared
+    @ObservedObject private var premiumSettings = PremiumSettings.shared
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack {
+                        Circle()
+                            .fill(premiumSettings.themeColor.color)
+                            .frame(width: 24, height: 24)
+                        Text(premiumSettings.themeColor.displayName)
+                        Spacer()
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.blue)
+                    }
+                } header: {
+                    Text("テーマ")
+                }
+
+                Section {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(fontSettings.selectedFont.displayName)
+                            Text("123")
+                                .font(fontSettings.selectedFont.font(size: 24))
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.blue)
+                    }
+                } header: {
+                    Text("Speed Font")
+                }
+
+                Section {
+                    NavigationLink {
+                        MockLocationHistoryView()
+                    } label: {
+                        HStack {
+                            Text("Location History")
+                            Spacer()
+                            Text("10 records")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+// MARK: - Mock Location History View
+struct MockLocationHistoryView: View {
+    private let mockRecords: [(speed: Double, lat: Double, lon: Double, altitude: Double, time: String)] = [
+        (52.3, 35.6905, 139.7455, 12, "14:32:15"),
+        (48.1, 35.6940, 139.7510, 15, "14:31:42"),
+        (45.2, 35.6782, 139.7450, 18, "14:30:58"),
+        (42.0, 35.6867, 139.7629, 10, "14:30:21"),
+        (38.5, 35.6740, 139.7580, 8, "14:29:45"),
+        (35.0, 35.6810, 139.7640, 11, "14:29:02"),
+        (25.3, 35.6755, 139.7505, 14, "14:28:18"),
+        (18.7, 35.6832, 139.7410, 16, "14:27:35"),
+        (15.2, 35.6912, 139.7576, 13, "14:26:52"),
+        (42.8, 35.6765, 139.7610, 9, "14:26:08"),
+    ]
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(0..<mockRecords.count, id: \.self) { index in
+                    let record = mockRecords[index]
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(String(format: "%.1f km/h", record.speed))
+                                .font(.headline)
+                            Spacer()
+                            Text("2025/12/30 \(record.time)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+
+                        HStack {
+                            Image(systemName: "location.fill")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            Text(String(format: "%.4f, %.4f", record.lat, record.lon))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+
+                            Spacer()
+
+                            Image(systemName: "arrow.up")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            Text(String(format: "%.0fm", record.altitude))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+            .navigationTitle("Location History")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
