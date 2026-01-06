@@ -17,3 +17,5 @@ Highlights:
 - View your route on Apple Maps
 
 Whether you're driving, cycling, or running, this speedometer app is your perfect companion for tracking your speed on the go.
+
+Terms of Use: https://speedmeter-f9de0.web.app/terms.html
