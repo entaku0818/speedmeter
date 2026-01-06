@@ -19,8 +19,7 @@ struct speedmeterApp: App {
         FirebaseApp.configure()
         Analytics.logEvent(AnalyticsEventAppOpen, parameters: nil)
 
-        // AdMob初期化
-        MobileAds.shared.start(completionHandler: nil)
+        // 注意: AdMob初期化はATT許可後に行う（.taskで実行）
 
         // RevenueCat初期化
         if let apiKey = Bundle.main.object(forInfoDictionaryKey: "RevenueCatAPIKey") as? String,
@@ -38,6 +37,10 @@ struct speedmeterApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                .task {
+                    // アプリがアクティブになってからATT許可を要求しAdMob初期化
+                    await ATTManager.shared.requestTrackingAuthorizationAndInitializeAds()
+                }
         }
     }
 }
