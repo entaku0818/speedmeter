@@ -19,11 +19,11 @@ enum ThemeColor: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .black: return "ブラック"
-        case .darkBlue: return "ダークブルー"
-        case .darkGreen: return "ダークグリーン"
-        case .darkRed: return "ダークレッド"
-        case .darkPurple: return "ダークパープル"
+        case .black: return "Black"
+        case .darkBlue: return "Dark Blue"
+        case .darkGreen: return "Dark Green"
+        case .darkRed: return "Dark Red"
+        case .darkPurple: return "Dark Purple"
         }
     }
 

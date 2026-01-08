@@ -60,7 +60,7 @@ struct PaywallView: View {
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
 
-                            Text("すべての機能をアンロック")
+                            Text("Unlock all features")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -71,29 +71,29 @@ struct PaywallView: View {
                             FeatureRow(
                                 icon: "xmark.circle.fill",
                                 iconColor: .red,
-                                title: "広告非表示",
-                                description: "バナー広告を完全に削除"
+                                title: "Ad-Free",
+                                description: "Remove all banner ads"
                             )
 
                             FeatureRow(
                                 icon: "textformat",
                                 iconColor: .orange,
-                                title: "フォントカスタマイズ",
-                                description: "8種類の追加フォントから選択"
+                                title: "Custom Fonts",
+                                description: "Choose from 8 additional fonts"
                             )
 
                             FeatureRow(
                                 icon: "paintpalette.fill",
                                 iconColor: .purple,
-                                title: "テーマカスタマイズ",
-                                description: "4種類の追加テーマから選択"
+                                title: "Custom Themes",
+                                description: "Choose from 4 additional themes"
                             )
 
                             FeatureRow(
                                 icon: "infinity",
                                 iconColor: .blue,
-                                title: "履歴無制限",
-                                description: "位置履歴を無制限に保存"
+                                title: "Unlimited History",
+                                description: "Save location history without limits"
                             )
                         }
                         .padding(.horizontal)
@@ -126,7 +126,7 @@ struct PaywallView: View {
                                     ProgressView()
                                         .tint(.white)
                                 } else {
-                                    Text("Proにアップグレード")
+                                    Text("Upgrade to Pro")
                                         .fontWeight(.semibold)
                                 }
                             }
@@ -145,7 +145,7 @@ struct PaywallView: View {
                                 await restore()
                             }
                         } label: {
-                            Text("購入を復元")
+                            Text("Restore Purchases")
                                 .font(.subheadline)
                                 .foregroundColor(.blue)
                         }
@@ -153,8 +153,8 @@ struct PaywallView: View {
 
                         // Terms
                         VStack(spacing: 4) {
-                            Text("サブスクリプションはiTunesアカウントに請求されます。")
-                            Text("期間終了の24時間前までにキャンセルしない限り自動更新されます。")
+                            Text("Subscription will be charged to your iTunes account.")
+                            Text("Auto-renews unless canceled at least 24 hours before the end of the period.")
                         }
                         .font(.caption2)
                         .foregroundColor(.secondary)
@@ -163,8 +163,8 @@ struct PaywallView: View {
 
                         // Legal Links
                         HStack(spacing: 16) {
-                            Link("プライバシーポリシー", destination: URL(string: "https://speedmeter-f9de0.web.app/privacy.html")!)
-                            Link("利用規約", destination: URL(string: "https://speedmeter-f9de0.web.app/terms.html")!)
+                            Link("Privacy Policy", destination: URL(string: "https://speedmeter-f9de0.web.app/privacy.html")!)
+                            Link("Terms of Use", destination: URL(string: "https://speedmeter-f9de0.web.app/terms.html")!)
                         }
                         .font(.caption)
                         .foregroundColor(.blue)
@@ -183,10 +183,10 @@ struct PaywallView: View {
                     }
                 }
             }
-            .alert("エラー", isPresented: $showError) {
+            .alert("Error", isPresented: $showError) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text(errorMessage ?? "不明なエラーが発生しました")
+                Text(errorMessage ?? "An unknown error occurred")
             }
             .task {
                 await loadProducts()

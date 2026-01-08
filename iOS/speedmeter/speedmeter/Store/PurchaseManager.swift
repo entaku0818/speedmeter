@@ -34,11 +34,11 @@ class PurchaseManager: PurchaseManagerProtocol, ObservableObject {
         var errorDescription: String? {
             switch self {
             case .productNotFound:
-                return "製品が見つかりません"
+                return "Product not found"
             case .purchaseFailed:
-                return "購入に失敗しました"
+                return "Purchase failed"
             case .noEntitlements:
-                return "有効なサブスクリプションが見つかりません"
+                return "No active subscription found"
             }
         }
     }
@@ -54,26 +54,26 @@ class PurchaseManager: PurchaseManagerProtocol, ObservableObject {
 
         var plans: [PlanInfo] = []
 
-        // 年額プラン
+        // Annual plan
         if let annualPackage = offering.availablePackages.first(where: { $0.identifier == "$rc_annual" }) {
             let plan = PlanInfo(
                 type: .annual,
                 name: annualPackage.storeProduct.localizedTitle,
                 price: annualPackage.localizedPriceString,
-                period: "年額",
-                savings: "2ヶ月分お得"
+                period: "Annual",
+                savings: "Save 2 months"
             )
             plans.append(plan)
             os_log("Found annual package: %{public}@", log: logger, type: .debug, annualPackage.identifier)
         }
 
-        // 月額プラン
+        // Monthly plan
         if let monthlyPackage = offering.availablePackages.first(where: { $0.identifier == "$rc_monthly" }) {
             let plan = PlanInfo(
                 type: .monthly,
                 name: monthlyPackage.storeProduct.localizedTitle,
                 price: monthlyPackage.localizedPriceString,
-                period: "月額",
+                period: "Monthly",
                 savings: nil
             )
             plans.append(plan)
