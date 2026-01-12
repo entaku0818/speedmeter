@@ -21,6 +21,8 @@ class ATTManager: ObservableObject {
     func requestTrackingAuthorizationAndInitializeAds() async {
         // ATTダイアログを表示（iOS 14以降）
         if ATTrackingManager.trackingAuthorizationStatus == .notDetermined {
+            // 1秒待ってから表示（UX向上のため）
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
             _ = await ATTrackingManager.requestTrackingAuthorization()
         }
 
