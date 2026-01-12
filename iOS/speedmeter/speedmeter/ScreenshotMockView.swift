@@ -208,9 +208,9 @@ struct MockSettingsView: View {
                             Image(systemName: "crown.fill")
                                 .foregroundColor(.yellow)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Proにアップグレード")
+                                Text("Upgrade to Pro")
                                     .foregroundColor(.primary)
-                                Text("広告非表示、フォント・テーマ変更、履歴無制限")
+                                Text("Ad-free, custom fonts & themes, unlimited history")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -234,7 +234,7 @@ struct MockSettingsView: View {
                             .foregroundColor(.blue)
                     }
                 } header: {
-                    Text("テーマ")
+                    Text("Theme")
                 }
 
                 Section {

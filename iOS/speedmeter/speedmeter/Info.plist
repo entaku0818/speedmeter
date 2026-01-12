@@ -24,7 +24,7 @@
 	<key>RevenueCatAPIKey</key>
 	<string>$(REVENUECAT_API_KEY)</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>お客様に最適な広告を表示するために使用します。</string>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
