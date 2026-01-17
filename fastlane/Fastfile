@@ -178,6 +178,30 @@ platform :ios do
     )
   end
 
+  # スクリーンショットのダウンロード
+  desc "Download screenshots from App Store Connect"
+  lane :download_screenshots do
+    version_number = get_version_number(
+      xcodeproj: "iOS/speedmeter/speedmeter.xcodeproj",
+      target: "speedmeter"
+    )
+
+    # App Store Connectからスクリーンショットをダウンロード
+    sh("mkdir -p ../fastlane/screenshots")
+
+    deliver(
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: false,
+      app_version: version_number,
+      force: true,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      overwrite_screenshots: false,
+      ignore_language_directory_validation: true
+    )
+  end
+
   # TestFlightにアップロード
   desc "Build and upload to TestFlight"
   lane :beta do

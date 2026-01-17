@@ -55,6 +55,14 @@ Full release: build, upload, metadata, and submit for review
 
 Download metadata from App Store Connect
 
+### ios download_screenshots
+
+```sh
+[bundle exec] fastlane ios download_screenshots
+```
+
+Download screenshots from App Store Connect
+
 ### ios beta
 
 ```sh
