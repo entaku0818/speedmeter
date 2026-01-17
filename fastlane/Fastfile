@@ -10,6 +10,10 @@
 #     https://docs.fastlane.tools/plugins/available-plugins
 #
 
+# Load environment variables from .env file
+require 'dotenv'
+Dotenv.load
+
 default_platform(:ios)
 
 platform :ios do
@@ -153,6 +157,25 @@ platform :ios do
     )
 
     UI.success("App submitted for review!")
+  end
+
+  # メタデータのダウンロード
+  desc "Download metadata from App Store Connect"
+  lane :download_metadata do
+    version_number = get_version_number(
+      xcodeproj: "iOS/speedmeter/speedmeter.xcodeproj",
+      target: "speedmeter"
+    )
+
+    deliver(
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: true,
+      app_version: version_number,
+      force: true,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false
+    )
   end
 
   # TestFlightにアップロード
