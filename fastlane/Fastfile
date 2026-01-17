@@ -63,6 +63,28 @@ platform :ios do
     )
   end
 
+  # スクリーンショットのみアップロード
+  desc "Upload screenshots only"
+  lane :upload_screenshots do
+    version_number = get_version_number(
+      xcodeproj: "iOS/speedmeter/speedmeter.xcodeproj",
+      target: "speedmeter"
+    )
+
+    deliver(
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: false,
+      app_version: version_number,
+      force: true,
+      overwrite_screenshots: true,
+      ignore_language_directory_validation: true,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      submit_for_review: false
+    )
+  end
+
   # メタデータのみアップロード（審査提出なし）
   desc "Upload metadata only without submitting for review"
   lane :upload_metadata_only do
