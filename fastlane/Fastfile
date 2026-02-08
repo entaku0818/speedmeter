@@ -235,6 +235,11 @@ platform :ios do
       project: "iOS/speedmeter/speedmeter.xcodeproj",
       scheme: "speedmeter",
       export_method: "app-store",
+      export_options: {
+        signingStyle: "automatic",
+        provisioningProfiles: {}
+      },
+      xcargs: "-allowProvisioningUpdates",
       output_directory: "./build",
       output_name: "speedmeter.ipa"
     )
