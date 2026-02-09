@@ -181,6 +181,36 @@ platform :ios do
     UI.success("App submitted for review!")
   end
 
+  # 既にアップロード済みのビルドを審査提出
+  desc "Submit already uploaded build for review"
+  lane :submit_build do
+    version_number = get_version_number(
+      xcodeproj: "iOS/speedmeter/speedmeter.xcodeproj",
+      target: "speedmeter"
+    )
+
+    deliver(
+      skip_binary_upload: true,
+      skip_app_version_update: false,
+      app_version: version_number,
+      skip_metadata: false,
+      skip_screenshots: true,
+      force: true,
+      submit_for_review: true,
+      automatic_release: false,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      ignore_language_directory_validation: true,
+      submission_information: {
+        add_id_info_uses_idfa: true,
+        export_compliance_uses_encryption: false,
+        export_compliance_platform: "ios"
+      }
+    )
+
+    UI.success("Build submitted for review!")
+  end
+
   # メタデータのダウンロード
   desc "Download metadata from App Store Connect"
   lane :download_metadata do

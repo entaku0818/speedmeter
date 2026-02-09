@@ -1,1 +1,2 @@
-Initial release
+Improved app discoverability in search.
+Minor bug fixes and improvements.
