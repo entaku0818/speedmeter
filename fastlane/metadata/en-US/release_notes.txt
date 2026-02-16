@@ -1,2 +1,2 @@
-Improved app discoverability in search.
-Minor bug fixes and improvements.
+Now available in English and Japanese.
+Improved app stability and performance.
