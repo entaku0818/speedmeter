@@ -61,4 +61,44 @@ class LocationHistoryStore: ObservableObject {
             print("Failed to load location history: \(error)")
         }
     }
+
+    // MARK: - Statistics
+    var averageSpeedKmh: Double {
+        guard !records.isEmpty else { return 0 }
+        return records.map { $0.speedKmh }.reduce(0, +) / Double(records.count)
+    }
+
+    var maxSpeedKmh: Double {
+        records.map { $0.speedKmh }.max() ?? 0
+    }
+
+    // MARK: - Export
+    func exportCSV() -> String {
+        let formatter = ISO8601DateFormatter()
+        var csv = "timestamp,latitude,longitude,altitude_m,speed_kmh\n"
+        for record in records.reversed() {
+            csv += "\(formatter.string(from: record.timestamp)),\(record.latitude),\(record.longitude),\(String(format: "%.1f", record.altitude)),\(String(format: "%.2f", record.speedKmh))\n"
+        }
+        return csv
+    }
+
+    func exportGPX() -> String {
+        let formatter = ISO8601DateFormatter()
+        var lines = [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<gpx version=\"1.1\" creator=\"Speedmeter\">",
+            "  <trk><name>Speedmeter Track</name><trkseg>"
+        ]
+        for record in records.reversed() {
+            lines += [
+                "    <trkpt lat=\"\(record.latitude)\" lon=\"\(record.longitude)\">",
+                "      <ele>\(String(format: "%.1f", record.altitude))</ele>",
+                "      <time>\(formatter.string(from: record.timestamp))</time>",
+                "      <extensions><speed>\(String(format: "%.3f", record.speed))</speed></extensions>",
+                "    </trkpt>"
+            ]
+        }
+        lines += ["  </trkseg></trk>", "</gpx>"]
+        return lines.joined(separator: "\n")
+    }
 }

@@ -263,6 +263,38 @@ struct SettingsView: View {
                         }
                     }
 
+                    // ② 速度統計セクション
+                    if !historyStore.records.isEmpty {
+                        Section {
+                            HStack {
+                                Label("Average Speed", systemImage: "speedometer")
+                                Spacer()
+                                Text(speedUnitSettings.unit == .mph
+                                    ? String(format: "%.1f mph", historyStore.averageSpeedKmh / 1.60934)
+                                    : String(format: "%.1f km/h", historyStore.averageSpeedKmh))
+                                    .foregroundColor(.secondary)
+                                    .font(.system(.body, design: .monospaced))
+                            }
+                            HStack {
+                                Label("Max Speed", systemImage: "gauge.with.dots.needle.100percent")
+                                Spacer()
+                                Text(speedUnitSettings.unit == .mph
+                                    ? String(format: "%.1f mph", historyStore.maxSpeedKmh / 1.60934)
+                                    : String(format: "%.1f km/h", historyStore.maxSpeedKmh))
+                                    .foregroundColor(.secondary)
+                                    .font(.system(.body, design: .monospaced))
+                            }
+                            HStack {
+                                Label("Total Records", systemImage: "chart.bar.fill")
+                                Spacer()
+                                Text("\(historyStore.records.count)")
+                                    .foregroundColor(.secondary)
+                            }
+                        } header: {
+                            Text("Statistics")
+                        }
+                    }
+
                     #if DEBUG
                     Section {
                         ForEach(SimulatedSpeed.allCases) { speed in
@@ -331,6 +363,9 @@ struct SettingsView: View {
 struct LocationHistoryView: View {
     @ObservedObject private var historyStore = LocationHistoryStore.shared
     @State private var showingClearAlert = false
+    @State private var showExportPicker = false
+    @State private var exportURL: URL?
+    @State private var showShareSheet = false
 
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -369,6 +404,26 @@ struct LocationHistoryView: View {
         }
         .navigationTitle("Location History")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            // ④ エクスポートボタン
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button {
+                        prepareExport(asCSV: true)
+                    } label: {
+                        Label("Export as CSV", systemImage: "tablecells")
+                    }
+                    Button {
+                        prepareExport(asCSV: false)
+                    } label: {
+                        Label("Export as GPX", systemImage: "map")
+                    }
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+                .disabled(historyStore.records.isEmpty)
+            }
+        }
         .alert("Clear History", isPresented: $showingClearAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Clear", role: .destructive) {
@@ -377,17 +432,39 @@ struct LocationHistoryView: View {
         } message: {
             Text("Are you sure you want to delete all location history? This action cannot be undone.")
         }
+        .sheet(isPresented: $showShareSheet) {
+            if let url = exportURL {
+                ActivitySheet(items: [url])
+            }
+        }
+    }
+
+    private func prepareExport(asCSV: Bool) {
+        let content = asCSV ? historyStore.exportCSV() : historyStore.exportGPX()
+        let filename = asCSV ? "speedmeter_history.csv" : "speedmeter_history.gpx"
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+        do {
+            try content.write(to: url, atomically: true, encoding: .utf8)
+            exportURL = url
+            showShareSheet = true
+        } catch {
+            print("Export failed: \(error)")
+        }
     }
 }
 
 struct LocationRecordRow: View {
     let record: LocationRecord
     let dateFormatter: DateFormatter
+    @ObservedObject private var speedUnitSettings = SpeedUnitSettings.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(String(format: "%.1f km/h", record.speedKmh))
+                let speedText = speedUnitSettings.unit == .mph
+                    ? String(format: "%.1f mph", record.speedKmh / 1.60934)
+                    : String(format: "%.1f km/h", record.speedKmh)
+                Text(speedText)
                     .font(.headline)
                 Spacer()
                 Text(dateFormatter.string(from: record.timestamp))
@@ -415,6 +492,18 @@ struct LocationRecordRow: View {
         }
         .padding(.vertical, 2)
     }
+}
+
+// ④ ShareSheet ラッパー（エクスポート用）
+import UIKit
+struct ActivitySheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {
