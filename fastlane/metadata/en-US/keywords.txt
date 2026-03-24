@@ -1,1 +1,1 @@
-speedometer,speed,GPS,car,bike,motorcycle,drive,cycling,workout,sport,navigation,odometer,hud
+speedometer,speed,GPS,mph,kmh,car,bike,cycling,drive,workout,statistics,export,odometer,sport

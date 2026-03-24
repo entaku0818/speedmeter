@@ -1,1 +1,1 @@
-Simple and easy-to-read GPS speedometer
+v1.2.0 now available: mph support, speed statistics & data export. Start your 7-day free trial today — all premium features, no commitment.

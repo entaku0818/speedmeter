@@ -1,2 +1,12 @@
-Now available in English and Japanese.
-Improved app stability and performance.
+[v1.2.0]
+
+■ New Features
+· mph / km/h toggle — switch units anytime (perfect for international drivers and imported vehicles)
+· Speed statistics — automatically track max speed, average speed, and total distance per trip
+· Data export — export your ride history as CSV to share or analyze
+· 7-day free trial — try all premium features at no cost
+
+■ Improvements
+· Faster speed display refresh rate
+· Optimized battery usage during background recording
+· Bug fixes and stability improvements
