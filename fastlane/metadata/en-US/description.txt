@@ -23,7 +23,12 @@ Check your current speed in real-time with a large digital display. Perfect for 
 - Dark mode optimized black background design
 - Stores up to 1000 location records
 - View your route on Apple Maps
-- Try all premium features free for 7 days
+
+◆ Premium Plan — 7-Day Free Trial
+- Speed statistics reports (max speed, average speed & distance)
+- CSV data export
+- Ad-free experience
+Cancel anytime. Try everything free for 7 days — no commitment required.
 
 Whether you're driving, cycling, or running, this speedometer app is your perfect companion for tracking your speed on the go.
 
