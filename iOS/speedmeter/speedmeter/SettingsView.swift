@@ -61,14 +61,43 @@ class FontSettings: ObservableObject {
     }
 
     private init() {
-        // デフォルトは無料のDigital Modern
         let saved = UserDefaults.standard.string(forKey: "selectedSpeedFont") ?? SpeedFont.digital7Modern.rawValue
         self.selectedFont = SpeedFont(rawValue: saved) ?? .digital7Modern
     }
 
-    /// 解約時に無料設定にリセット
     func resetToFree() {
         selectedFont = .digital7Modern
+    }
+}
+
+// ① mph/km切り替え設定
+enum SpeedUnit: String, CaseIterable, Identifiable {
+    case kmh = "km/h"
+    case mph = "mph"
+
+    var id: String { rawValue }
+    var displayName: String { rawValue }
+
+    func convert(_ kmh: Double) -> Double {
+        switch self {
+        case .kmh: return kmh
+        case .mph: return kmh * 0.621371
+        }
+    }
+}
+
+class SpeedUnitSettings: ObservableObject {
+    static let shared = SpeedUnitSettings()
+
+    @Published var unit: SpeedUnit {
+        didSet {
+            UserDefaults.standard.set(unit.rawValue, forKey: "selectedSpeedUnit")
+        }
+    }
+
+    private init() {
+        let saved = UserDefaults.standard.string(forKey: "selectedSpeedUnit") ?? SpeedUnit.kmh.rawValue
+        self.unit = SpeedUnit(rawValue: saved) ?? .kmh
     }
 }
 
@@ -78,6 +107,7 @@ struct SettingsView: View {
     @ObservedObject private var fontSettings = FontSettings.shared
     @ObservedObject private var purchaseManager = PurchaseManager.shared
     @ObservedObject private var premiumSettings = PremiumSettings.shared
+    @ObservedObject private var speedUnitSettings = SpeedUnitSettings.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showingScreenshotMode = false
     @State private var showingPaywall = false
@@ -86,146 +116,188 @@ struct SettingsView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 List {
-                // Pro Plan Section
-                if !purchaseManager.isPremium {
+                    // Pro Plan Section
+                    if !purchaseManager.isPremium {
+                        Section {
+                            Button {
+                                showingPaywall = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: "crown.fill")
+                                        .foregroundColor(.yellow)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Upgrade to Pro")
+                                            .foregroundColor(.primary)
+                                        Text("Ad-free, custom fonts & themes, unlimited history")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        } header: {
+                            Text("Pro Plan")
+                        }
+                    }
+
+                    // ① Speed Unit Section
                     Section {
-                        Button {
-                            showingPaywall = true
-                        } label: {
+                        HStack(spacing: 0) {
+                            ForEach(SpeedUnit.allCases) { unit in
+                                Button {
+                                    speedUnitSettings.unit = unit
+                                } label: {
+                                    HStack {
+                                        Spacer()
+                                        if speedUnitSettings.unit == unit {
+                                            Image(systemName: "checkmark")
+                                                .font(.caption)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.white)
+                                        }
+                                        Text(unit.displayName)
+                                            .font(.system(.body, design: .monospaced))
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(speedUnitSettings.unit == unit ? .white : .primary)
+                                        Spacer()
+                                    }
+                                    .padding(.vertical, 10)
+                                    .background(speedUnitSettings.unit == unit ? Color.blue : Color.clear)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                if unit != SpeedUnit.allCases.last {
+                                    Divider()
+                                }
+                            }
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.blue.opacity(0.4), lineWidth: 1)
+                        )
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    } header: {
+                        Text("Speed Unit")
+                    } footer: {
+                        Text("Changes the unit displayed on the speedometer.")
+                    }
+
+                    Section {
+                        ForEach(ThemeColor.allCases) { theme in
                             HStack {
-                                Image(systemName: "crown.fill")
-                                    .foregroundColor(.yellow)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Upgrade to Pro")
-                                        .foregroundColor(.primary)
-                                    Text("Ad-free, custom fonts & themes, unlimited history")
+                                Circle()
+                                    .fill(theme.color)
+                                    .frame(width: 24, height: 24)
+                                Text(theme.displayName)
+                                if !theme.isFree && !purchaseManager.isPremium {
+                                    Image(systemName: "lock.fill")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
                                 Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.secondary)
+                                if premiumSettings.themeColor == theme {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if theme.isFree || purchaseManager.isPremium {
+                                    premiumSettings.themeColor = theme
+                                } else {
+                                    showingPaywall = true
+                                }
                             }
                         }
                     } header: {
-                        Text("Pro Plan")
+                        Text("Theme")
                     }
-                }
 
-                Section {
-                    ForEach(ThemeColor.allCases) { theme in
-                        HStack {
-                            Circle()
-                                .fill(theme.color)
-                                .frame(width: 24, height: 24)
-                            Text(theme.displayName)
-                            if !theme.isFree && !purchaseManager.isPremium {
-                                Image(systemName: "lock.fill")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            if premiumSettings.themeColor == theme {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(.blue)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if theme.isFree || purchaseManager.isPremium {
-                                premiumSettings.themeColor = theme
-                            } else {
-                                showingPaywall = true
-                            }
-                        }
-                    }
-                } header: {
-                    Text("Theme")
-                }
-
-                Section {
-                    ForEach(SpeedFont.allCases) { font in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Text(font.displayName)
-                                    if !font.isFree && !purchaseManager.isPremium {
-                                        Image(systemName: "lock.fill")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
+                    Section {
+                        ForEach(SpeedFont.allCases) { font in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(font.displayName)
+                                        if !font.isFree && !purchaseManager.isPremium {
+                                            Image(systemName: "lock.fill")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
                                     }
+                                    Text("123")
+                                        .font(font.font(size: 24))
+                                        .foregroundColor(.secondary)
                                 }
-                                Text("123")
-                                    .font(font.font(size: 24))
+                                Spacer()
+                                if fontSettings.selectedFont == font {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if font.isFree || purchaseManager.isPremium {
+                                    fontSettings.selectedFont = font
+                                } else {
+                                    showingPaywall = true
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Speed Font")
+                    }
+
+                    Section {
+                        NavigationLink {
+                            LocationHistoryView()
+                        } label: {
+                            HStack {
+                                Text("Location History")
+                                Spacer()
+                                Text("\(historyStore.records.count) records")
                                     .foregroundColor(.secondary)
                             }
-                            Spacer()
-                            if fontSettings.selectedFont == font {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(.blue)
+                        }
+                    }
+
+                    #if DEBUG
+                    Section {
+                        ForEach(SimulatedSpeed.allCases) { speed in
+                            HStack {
+                                Text(speed.rawValue)
+                                Spacer()
+                                if locationManager.simulatedSpeed == speed {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                locationManager.simulatedSpeed = speed
                             }
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if font.isFree || purchaseManager.isPremium {
-                                fontSettings.selectedFont = font
-                            } else {
-                                showingPaywall = true
+                    } header: {
+                        Text("Debug: Simulate Speed")
+                    }
+
+                    Section {
+                        Button {
+                            showingScreenshotMode = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "camera.viewfinder")
+                                Text("Screenshot Mode")
                             }
                         }
+                    } header: {
+                        Text("Debug: Screenshots")
+                    } footer: {
+                        Text("Open mock screens for App Store screenshots")
                     }
-                } header: {
-                    Text("Speed Font")
-                }
-
-                Section {
-                    NavigationLink {
-                        LocationHistoryView()
-                    } label: {
-                        HStack {
-                            Text("Location History")
-                            Spacer()
-                            Text("\(historyStore.records.count) records")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-
-                #if DEBUG
-                Section {
-                    ForEach(SimulatedSpeed.allCases) { speed in
-                        HStack {
-                            Text(speed.rawValue)
-                            Spacer()
-                            if locationManager.simulatedSpeed == speed {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(.blue)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            locationManager.simulatedSpeed = speed
-                        }
-                    }
-                } header: {
-                    Text("Debug: Simulate Speed")
-                }
-
-                Section {
-                    Button {
-                        showingScreenshotMode = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "camera.viewfinder")
-                            Text("Screenshot Mode")
-                        }
-                    }
-                } header: {
-                    Text("Debug: Screenshots")
-                } footer: {
-                    Text("Open mock screens for App Store screenshots")
-                }
-                #endif
+                    #endif
                 }
 
                 if !purchaseManager.isPremium {

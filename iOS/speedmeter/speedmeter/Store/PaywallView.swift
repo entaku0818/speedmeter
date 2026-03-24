@@ -66,6 +66,10 @@ struct PaywallView: View {
                         }
                         .padding(.top, 32)
 
+                        // ③ 7日間無料トライアルバナー
+                        FreeTrialBanner()
+                            .padding(.horizontal)
+
                         // Features
                         VStack(spacing: 12) {
                             FeatureRow(
@@ -115,35 +119,47 @@ struct PaywallView: View {
                             .padding(.horizontal)
                         }
 
-                        // Purchase Button
-                        Button {
-                            Task {
-                                await purchase()
-                            }
-                        } label: {
-                            HStack {
-                                if isPurchasing {
-                                    ProgressView()
-                                        .tint(.white)
-                                } else {
-                                    Text("Upgrade to Pro")
-                                        .fontWeight(.semibold)
+                        // ③ 購入CTA - 無料トライアル訴求
+                        VStack(spacing: 8) {
+                            Button {
+                                Task { await purchase() }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    if isPurchasing {
+                                        ProgressView()
+                                            .tint(.black)
+                                    } else {
+                                        Image(systemName: "gift.fill")
+                                            .font(.subheadline)
+                                            .foregroundColor(.black)
+                                        Text("Start 7-Day Free Trial")
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.black)
+                                    }
                                 }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.yellow, Color(red: 1.0, green: 0.75, blue: 0.0)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .cornerRadius(14)
+                                .shadow(color: Color.yellow.opacity(0.4), radius: 8, x: 0, y: 4)
                             }
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 50)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
+                            .disabled(isPurchasing || isLoading)
+
+                            Text("then continues at selected plan price · cancel anytime")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
                         }
-                        .disabled(isPurchasing || isLoading)
                         .padding(.horizontal)
 
                         // Restore Button
                         Button {
-                            Task {
-                                await restore()
-                            }
+                            Task { await restore() }
                         } label: {
                             Text("Restore Purchases")
                                 .font(.subheadline)
@@ -192,9 +208,7 @@ struct PaywallView: View {
                 await loadProducts()
             }
             .onChange(of: purchaseManager.isPremium) { _, isPremium in
-                if isPremium {
-                    dismiss()
-                }
+                if isPremium { dismiss() }
             }
         }
     }
@@ -208,9 +222,7 @@ struct PaywallView: View {
                 isLoading = false
             }
         } catch {
-            await MainActor.run {
-                isLoading = false
-            }
+            await MainActor.run { isLoading = false }
         }
     }
 
@@ -224,9 +236,7 @@ struct PaywallView: View {
                 showError = true
             }
         }
-        await MainActor.run {
-            isPurchasing = false
-        }
+        await MainActor.run { isPurchasing = false }
     }
 
     private func restore() async {
@@ -239,9 +249,49 @@ struct PaywallView: View {
                 showError = true
             }
         }
-        await MainActor.run {
-            isPurchasing = false
+        await MainActor.run { isPurchasing = false }
+    }
+}
+
+// ③ 7日間無料トライアルバナー
+struct FreeTrialBanner: View {
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.title2)
+                .foregroundColor(.yellow)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("7-DAY FREE TRIAL")
+                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .foregroundColor(.yellow)
+                    .tracking(0.5)
+                Text("Try all Pro features free. No charge today.")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.8))
+            }
+
+            Spacer()
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.yellow.opacity(0.25),
+                            Color.orange.opacity(0.15)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.yellow.opacity(0.5), lineWidth: 1.5)
+                )
+        )
     }
 }
 

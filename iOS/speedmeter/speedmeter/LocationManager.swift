@@ -34,11 +34,17 @@ enum SimulatedSpeed: String, CaseIterable, Identifiable {
 class LocationManager: NSObject, ObservableObject {
     private let locationManager = CLLocationManager()
     private var lastRecordTime: Date?
-    private let recordInterval: TimeInterval = 5.0 // Record every 5 seconds
+    private let recordInterval: TimeInterval = 5.0
     private var simulationTimer: Timer?
+
+    // セッション統計用
+    private var sessionSpeedTotal: Double = 0.0
+    private var sessionSpeedCount: Int = 0
 
     @Published var speed: Double = 0.0 // m/s
     @Published var speedKmh: Double = 0.0 // km/h
+    @Published var maxSpeedKmh: Double = 0.0
+    @Published var averageSpeedKmh: Double = 0.0
     @Published var isTracking: Bool = false
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var simulatedSpeed: SimulatedSpeed = .none {
@@ -63,6 +69,11 @@ class LocationManager: NSObject, ObservableObject {
     func startTracking() {
         locationManager.startUpdatingLocation()
         isTracking = true
+        // セッション統計をリセット
+        maxSpeedKmh = 0.0
+        averageSpeedKmh = 0.0
+        sessionSpeedTotal = 0.0
+        sessionSpeedCount = 0
     }
 
     func stopTracking() {
@@ -74,19 +85,28 @@ class LocationManager: NSObject, ObservableObject {
         speedKmh = 0.0
     }
 
+    private func updateSpeedStats(_ kmh: Double) {
+        if kmh > maxSpeedKmh {
+            maxSpeedKmh = kmh
+        }
+        sessionSpeedTotal += kmh
+        sessionSpeedCount += 1
+        averageSpeedKmh = sessionSpeedTotal / Double(sessionSpeedCount)
+    }
+
     private func updateSimulation() {
         simulationTimer?.invalidate()
         simulationTimer = nil
 
-        guard let simSpeed = simulatedSpeed.speedKmh else {
-            return
-        }
+        guard let simSpeed = simulatedSpeed.speedKmh else { return }
 
         simulationTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             let variation = Double.random(in: -2...2)
-            self.speedKmh = max(0, simSpeed + variation)
-            self.speed = self.speedKmh / 3.6
+            let newSpeed = max(0, simSpeed + variation)
+            self.speedKmh = newSpeed
+            self.speed = newSpeed / 3.6
+            self.updateSpeedStats(newSpeed)
         }
     }
 }
@@ -95,13 +115,12 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
 
-        // speed is in m/s, negative if invalid
         if location.speed >= 0 {
             speed = location.speed
-            speedKmh = speed * 3.6 // convert m/s to km/h
+            speedKmh = speed * 3.6
+            updateSpeedStats(speedKmh)
         }
 
-        // Record location at intervals
         let now = Date()
         if lastRecordTime == nil || now.timeIntervalSince(lastRecordTime!) >= recordInterval {
             lastRecordTime = now
