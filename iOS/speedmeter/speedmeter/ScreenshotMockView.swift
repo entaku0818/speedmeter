@@ -49,30 +49,106 @@ enum ScreenshotLanguage: String, CaseIterable {
     var customThemesDescription: String { self == .english ? "Choose from 4 additional themes" : "4種類の追加テーマから選択" }
     var unlimitedHistory: String { self == .english ? "Unlimited History" : "無制限の履歴" }
     var unlimitedHistoryDescription: String { self == .english ? "Save location history without limits" : "位置履歴を無制限に保存" }
+
+    // Screenshot captions
+    var captionSpeed: String { self == .english ? "Know Your Speed.\nLive." : "リアルタイムで\n速度を確認" }
+    var captionStats: String { self == .english ? "Auto-Track\nYour Stats" : "走行データを\n自動集計" }
+    var captionMap: String { self == .english ? "Visualize\nYour Route" : "走行ルートを\n地図で確認" }
+    var captionExport: String { self == .english ? "Export Your\nRide Data" : "CSVで走行記録を\nエクスポート" }
+
+    // Stats labels
+    var maxSpeed: String { self == .english ? "Max" : "最高速度" }
+    var avgSpeed: String { self == .english ? "Avg" : "平均速度" }
+    var distance: String { self == .english ? "Distance" : "走行距離" }
+    var todayTrip: String { self == .english ? "Today's Trip" : "今日の走行" }
+}
+
+// MARK: - App Store Screenshot Wrapper
+struct AppStoreScreenshotWrapper<Content: View>: View {
+    let caption: String
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text(caption)
+                .font(.system(size: 34, weight: .bold))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+                .foregroundColor(.white)
+                .padding(.horizontal, 28)
+                .padding(.top, 52)
+                .padding(.bottom, 24)
+                .frame(maxWidth: .infinity)
+                .background(Color.black)
+
+            Rectangle()
+                .fill(Color.green.opacity(0.7))
+                .frame(height: 2)
+
+            content()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black)
+    }
 }
 
 struct ScreenshotMockView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedLanguage: ScreenshotLanguage?
-    @State private var selectedTab = 0
+    @State private var currentScreen = 0
+
+    private let totalScreens = 4
 
     var body: some View {
         if let language = selectedLanguage {
-            TabView(selection: $selectedTab) {
-                MockSpeedView(language: language)
-                    .tabItem {
-                        Image(systemName: "speedometer")
-                        Text(language.speed)
+            ZStack {
+                switch currentScreen {
+                case 0:
+                    AppStoreScreenshotWrapper(caption: language.captionSpeed) {
+                        MockSpeedContent(language: language)
                     }
-                    .tag(0)
+                case 1:
+                    AppStoreScreenshotWrapper(caption: language.captionStats) {
+                        MockStatsContent(language: language)
+                    }
+                case 2:
+                    AppStoreScreenshotWrapper(caption: language.captionMap) {
+                        MockMapView(language: language)
+                    }
+                case 3:
+                    AppStoreScreenshotWrapper(caption: language.captionExport) {
+                        MockExportContent(language: language)
+                    }
+                default:
+                    AppStoreScreenshotWrapper(caption: language.captionSpeed) {
+                        MockSpeedContent(language: language)
+                    }
+                }
 
-                MockMapView(language: language)
-                    .tabItem {
-                        Image(systemName: "map")
-                        Text(language.map)
+                // Page indicator
+                VStack {
+                    Spacer()
+                    HStack(spacing: 6) {
+                        ForEach(0..<totalScreens, id: \.self) { i in
+                            Circle()
+                                .fill(i == currentScreen ? Color.white : Color.white.opacity(0.3))
+                                .frame(width: 6, height: 6)
+                        }
                     }
-                    .tag(1)
+                    .padding(.bottom, 12)
+                }
             }
+            .onTapGesture {
+                if currentScreen < totalScreens - 1 {
+                    currentScreen += 1
+                } else {
+                    dismiss()
+                }
+            }
+            .navigationBarHidden(true)
+            .ignoresSafeArea()
         } else {
             // Language Selection
             VStack(spacing: 32) {
@@ -106,36 +182,35 @@ struct ScreenshotMockView: View {
     }
 }
 
-// MARK: - Mock Speed View
-struct MockSpeedView: View {
+// MARK: - Mock Speed Content
+struct MockSpeedContent: View {
     let language: ScreenshotLanguage
-    @State private var showingSettings = false
 
     var body: some View {
         ZStack {
             Color.black
-                .ignoresSafeArea()
 
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
+                // Status bar
                 HStack {
+                    Text("9:41")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.white)
                     Spacer()
-                    Button {
-                        showingSettings = true
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                            .padding()
-                    }
+                    Image(systemName: "gearshape.fill")
+                        .font(.title3)
+                        .foregroundColor(.white)
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
 
                 Spacer()
 
-                VStack(spacing: 8) {
-                    Text("42")
-                        .font(.system(size: 120, weight: .bold, design: .monospaced))
+                // Main speed display
+                VStack(spacing: 6) {
+                    Text("87")
+                        .font(.system(size: 130, weight: .bold, design: .monospaced))
                         .foregroundColor(.white)
-
                     Text(language.kmh)
                         .font(.title)
                         .foregroundColor(.gray)
@@ -143,28 +218,205 @@ struct MockSpeedView: View {
 
                 Spacer()
 
-                VStack(spacing: 16) {
-                    HStack {
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 10, height: 10)
-                        Text(language.gpsActive)
-                            .foregroundColor(.green)
-                    }
-
-                    Text(language.stop)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .frame(width: 200, height: 50)
-                        .background(Color.red)
-                        .cornerRadius(25)
+                // Stats bar
+                HStack(spacing: 0) {
+                    StatCell(label: language.maxSpeed, value: "96", unit: language.kmh)
+                    Rectangle().fill(Color.white.opacity(0.15)).frame(width: 1, height: 32)
+                    StatCell(label: language.avgSpeed, value: "68", unit: language.kmh)
+                    Rectangle().fill(Color.white.opacity(0.15)).frame(width: 1, height: 32)
+                    StatCell(label: language.distance, value: "12.3", unit: "km")
                 }
-                .padding(.bottom, 20)
+                .padding(.vertical, 14)
+                .background(Color.white.opacity(0.06))
+                .cornerRadius(14)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+
+                // GPS status + stop button
+                VStack(spacing: 14) {
+                    HStack(spacing: 6) {
+                        Circle().fill(Color.green).frame(width: 10, height: 10)
+                        Text(language.gpsActive).foregroundColor(.green)
+                    }
+                    Text(language.stop)
+                        .font(.title2).fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .frame(width: 200, height: 52)
+                        .background(Color.red)
+                        .cornerRadius(26)
+                }
+                .padding(.bottom, 28)
             }
         }
-        .fullScreenCover(isPresented: $showingSettings) {
-            MockSettingsView(language: language)
+    }
+}
+
+struct StatCell: View {
+    let label: String
+    let value: String
+    let unit: String
+
+    var body: some View {
+        VStack(spacing: 3) {
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.gray)
+            Text(value)
+                .font(.system(size: 22, weight: .bold, design: .monospaced))
+                .foregroundColor(.white)
+            Text(unit)
+                .font(.caption2)
+                .foregroundColor(.gray)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - Mock Stats Content
+struct MockStatsContent: View {
+    let language: ScreenshotLanguage
+
+    var body: some View {
+        ZStack {
+            Color.black
+
+            VStack(spacing: 20) {
+                Text(language.todayTrip)
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                    .padding(.top, 20)
+
+                // Big stat cards
+                VStack(spacing: 12) {
+                    BigStatCard(
+                        icon: "bolt.fill",
+                        iconColor: .orange,
+                        label: language.maxSpeed,
+                        value: "96",
+                        unit: language.kmh
+                    )
+                    BigStatCard(
+                        icon: "speedometer",
+                        iconColor: .blue,
+                        label: language.avgSpeed,
+                        value: "68",
+                        unit: language.kmh
+                    )
+                    BigStatCard(
+                        icon: "location.fill",
+                        iconColor: .green,
+                        label: language.distance,
+                        value: "12.3",
+                        unit: "km"
+                    )
+                }
+                .padding(.horizontal, 16)
+
+                Spacer()
+            }
+        }
+    }
+}
+
+struct BigStatCard: View {
+    let icon: String
+    let iconColor: Color
+    let label: String
+    let value: String
+    let unit: String
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(iconColor)
+                .frame(width: 44, height: 44)
+                .background(iconColor.opacity(0.15))
+                .cornerRadius(12)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text(value)
+                        .font(.system(size: 36, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                    Text(unit)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .background(Color.white.opacity(0.06))
+        .cornerRadius(16)
+    }
+}
+
+// MARK: - Mock Export Content
+struct MockExportContent: View {
+    let language: ScreenshotLanguage
+
+    private let rows: [(speed: String, time: String)] = [
+        ("52.3 km/h", "14:32:15"),
+        ("48.1 km/h", "14:31:42"),
+        ("45.2 km/h", "14:30:58"),
+        ("42.0 km/h", "14:30:21"),
+        ("38.5 km/h", "14:29:45"),
+    ]
+
+    var body: some View {
+        ZStack {
+            Color.black
+
+            VStack(spacing: 0) {
+                // CSV preview header
+                HStack {
+                    Text("speed,lat,lon,timestamp")
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                    Spacer()
+                }
+                .background(Color.white.opacity(0.06))
+
+                // Rows
+                ForEach(rows, id: \.time) { row in
+                    HStack {
+                        Text("\(row.speed),35.68,139.75,\(row.time)")
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.85))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                        Spacer()
+                    }
+                    Divider().background(Color.white.opacity(0.1))
+                }
+
+                Spacer()
+
+                // Export button
+                HStack(spacing: 10) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.title3)
+                    Text(language == .japanese ? "CSVをエクスポート" : "Export as CSV")
+                        .font(.headline)
+                }
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(Color.green)
+                .cornerRadius(14)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
+            }
         }
     }
 }

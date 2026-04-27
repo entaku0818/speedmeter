@@ -1,6 +1,6 @@
-A simple and easy-to-read GPS speedometer app.
-
-Check your current speed in real-time with a large digital display. Perfect for driving, cycling, running, and more.
+Track your speed in real-time — for driving, cycling, or running.
+Large digital display you can read at a glance. Automatically records max speed, average speed, and total distance.
+Export your trip history as CSV and take full ownership of your data.
 
 ◆ New in v1.2.0
 - mph / km/h toggle (great for import cars and international travel)
