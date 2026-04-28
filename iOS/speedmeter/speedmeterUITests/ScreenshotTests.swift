@@ -6,7 +6,7 @@
 //
 //  実行方法:
 //  xcodebuild test -project iOS/speedmeter/speedmeter.xcodeproj \
-//    -scheme speedmeter -destination 'platform=iOS Simulator,name=iPhone 14 Pro Max' \
+//    -scheme speedmeter -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.1' \
 //    -only-testing:speedmeterUITests/ScreenshotTests
 //
 
@@ -16,15 +16,13 @@ final class ScreenshotTests: XCTestCase {
     var app: XCUIApplication!
     var language: String = "en"
 
-    // スクショ保存先
     let screenshotDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         .appendingPathComponent("Screenshots")
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-
-        // スクショディレクトリ作成
+        app.launchArguments = ["-UITestScreenshotMode"]
         try? FileManager.default.createDirectory(at: screenshotDir, withIntermediateDirectories: true)
     }
 
@@ -35,10 +33,25 @@ final class ScreenshotTests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
 
-        // ファイルにも保存
         let fileURL = screenshotDir.appendingPathComponent("\(name).png")
         try? screenshot.pngRepresentation.write(to: fileURL)
         print("📸 Screenshot saved: \(fileURL.path)")
+    }
+
+    func tapToNextScreen() {
+        let center = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4))
+        center.tap()
+        sleep(1)
+    }
+
+    func selectLanguage(_ languageButton: String) throws {
+        app.launch()
+        sleep(2)
+
+        let langButton = app.buttons[languageButton]
+        XCTAssertTrue(langButton.waitForExistence(timeout: 5), "\(languageButton) button not found")
+        langButton.tap()
+        sleep(1)
     }
 
     // MARK: - English Screenshots
@@ -46,54 +59,22 @@ final class ScreenshotTests: XCTestCase {
     @MainActor
     func testTakeEnglishScreenshots() throws {
         language = "en"
-        app.launch()
-        sleep(2)
+        try selectLanguage("English")
 
-        // Settings画面へ
-        let settingsButton = app.buttons["gearshape.fill"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button not found")
-        settingsButton.tap()
-        sleep(1)
-
-        // Screenshot Modeをタップ (スクロールして探す)
-        let screenshotMode = app.staticTexts["Screenshot Mode"]
-        if !screenshotMode.exists {
-            app.swipeUp()
-            sleep(1)
-        }
-        XCTAssertTrue(screenshotMode.waitForExistence(timeout: 3), "Screenshot Mode not found")
-        screenshotMode.tap()
-        sleep(1)
-
-        // English選択
-        let englishButton = app.buttons["English"]
-        XCTAssertTrue(englishButton.waitForExistence(timeout: 3), "English button not found")
-        englishButton.tap()
-        sleep(1)
-
-        // 1. Speed画面
+        // Screen 1: Speed + Stats bar
         saveScreenshot("01_speed_\(language)")
 
-        // 2. Map画面
-        app.tabBars.buttons.element(boundBy: 1).tap()
-        sleep(1)
-        saveScreenshot("02_map_\(language)")
+        // Screen 2: Stats detail
+        tapToNextScreen()
+        saveScreenshot("02_stats_\(language)")
 
-        // 3. Settings (Speed tabに戻ってgear iconをタップ)
-        app.tabBars.buttons.element(boundBy: 0).tap()
-        sleep(1)
-        let mockSettingsButton = app.buttons["gearshape.fill"]
-        XCTAssertTrue(mockSettingsButton.waitForExistence(timeout: 3), "Mock settings button not found")
-        mockSettingsButton.tap()
-        sleep(1)
-        saveScreenshot("03_settings_\(language)")
+        // Screen 3: Map
+        tapToNextScreen()
+        saveScreenshot("03_map_\(language)")
 
-        // 4. Paywall
-        let upgradeCell = app.staticTexts["Upgrade to Pro"]
-        XCTAssertTrue(upgradeCell.waitForExistence(timeout: 3), "Upgrade to Pro not found")
-        upgradeCell.tap()
-        sleep(1)
-        saveScreenshot("04_paywall_\(language)")
+        // Screen 4: Export
+        tapToNextScreen()
+        saveScreenshot("04_export_\(language)")
 
         print("✅ English screenshots completed!")
         print("📁 Saved to: \(screenshotDir.path)")
@@ -104,54 +85,22 @@ final class ScreenshotTests: XCTestCase {
     @MainActor
     func testTakeJapaneseScreenshots() throws {
         language = "ja"
-        app.launch()
-        sleep(2)
+        try selectLanguage("日本語")
 
-        // Settings画面へ
-        let settingsButton = app.buttons["gearshape.fill"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button not found")
-        settingsButton.tap()
-        sleep(1)
-
-        // Screenshot Modeをタップ
-        let screenshotMode = app.staticTexts["Screenshot Mode"]
-        if !screenshotMode.exists {
-            app.swipeUp()
-            sleep(1)
-        }
-        XCTAssertTrue(screenshotMode.waitForExistence(timeout: 3), "Screenshot Mode not found")
-        screenshotMode.tap()
-        sleep(1)
-
-        // 日本語選択
-        let japaneseButton = app.buttons["日本語"]
-        XCTAssertTrue(japaneseButton.waitForExistence(timeout: 3), "Japanese button not found")
-        japaneseButton.tap()
-        sleep(1)
-
-        // 1. Speed画面
+        // Screen 1: Speed + Stats bar
         saveScreenshot("01_speed_\(language)")
 
-        // 2. Map画面
-        app.tabBars.buttons.element(boundBy: 1).tap()
-        sleep(1)
-        saveScreenshot("02_map_\(language)")
+        // Screen 2: Stats detail
+        tapToNextScreen()
+        saveScreenshot("02_stats_\(language)")
 
-        // 3. Settings
-        app.tabBars.buttons.element(boundBy: 0).tap()
-        sleep(1)
-        let mockSettingsButton = app.buttons["gearshape.fill"]
-        XCTAssertTrue(mockSettingsButton.waitForExistence(timeout: 3), "Mock settings button not found")
-        mockSettingsButton.tap()
-        sleep(1)
-        saveScreenshot("03_settings_\(language)")
+        // Screen 3: Map
+        tapToNextScreen()
+        saveScreenshot("03_map_\(language)")
 
-        // 4. Paywall
-        let upgradeCell = app.staticTexts["Proにアップグレード"]
-        XCTAssertTrue(upgradeCell.waitForExistence(timeout: 3), "Upgrade to Pro (JP) not found")
-        upgradeCell.tap()
-        sleep(1)
-        saveScreenshot("04_paywall_\(language)")
+        // Screen 4: Export
+        tapToNextScreen()
+        saveScreenshot("04_export_\(language)")
 
         print("✅ Japanese screenshots completed!")
         print("📁 Saved to: \(screenshotDir.path)")

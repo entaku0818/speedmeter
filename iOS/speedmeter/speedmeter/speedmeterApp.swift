@@ -36,11 +36,22 @@ struct speedmeterApp: App {
 
     var body: some Scene {
         WindowGroup {
+            #if DEBUG
+            if CommandLine.arguments.contains("-UITestScreenshotMode") {
+                ScreenshotMockView()
+            } else {
+                MainTabView()
+                    .task {
+                        await ATTManager.shared.requestTrackingAuthorizationAndInitializeAds()
+                    }
+            }
+            #else
             MainTabView()
                 .task {
                     // アプリがアクティブになってからATT許可を要求しAdMob初期化
                     await ATTManager.shared.requestTrackingAuthorizationAndInitializeAds()
                 }
+            #endif
         }
     }
 }

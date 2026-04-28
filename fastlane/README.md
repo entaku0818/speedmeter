@@ -55,6 +55,14 @@ Build, archive and upload to App Store Connect
 
 Full release: build, upload, metadata, and submit for review
 
+### ios submit_build
+
+```sh
+[bundle exec] fastlane ios submit_build
+```
+
+Submit already uploaded build for review
+
 ### ios download_metadata
 
 ```sh
