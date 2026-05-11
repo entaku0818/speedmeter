@@ -1,2 +1,3 @@
-Improved app discoverability in search.
-Minor improvements.
+• Speed Warning: display turns red and vibrates when your set speed threshold is exceeded
+• Altitude & Compass: shows current elevation and heading direction while tracking
+• Knots unit support: now supports knots for marine and aviation use

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import UIKit
 
 struct SpeedView: View {
     @ObservedObject var locationManager: LocationManager
@@ -14,24 +15,37 @@ struct SpeedView: View {
     @ObservedObject private var purchaseManager = PurchaseManager.shared
     @ObservedObject private var premiumSettings = PremiumSettings.shared
     @ObservedObject private var speedUnitSettings = SpeedUnitSettings.shared
+    @ObservedObject private var warningSettings = SpeedWarningSettings.shared
     @State private var showingSettings = false
 
     private var backgroundColor: Color {
         purchaseManager.isPremium ? premiumSettings.themeColor.color : .black
     }
 
-    // 現在速度を選択単位に変換
     private var displaySpeed: Double {
         speedUnitSettings.unit.convert(locationManager.speedKmh)
     }
 
-    // 統計値を選択単位に変換
     private var displayMax: Double {
         speedUnitSettings.unit.convert(locationManager.maxSpeedKmh)
     }
 
     private var displayAverage: Double {
         speedUnitSettings.unit.convert(locationManager.averageSpeedKmh)
+    }
+
+    private var isOverThreshold: Bool {
+        warningSettings.isEnabled && displaySpeed >= warningSettings.threshold
+    }
+
+    private var speedColor: Color {
+        isOverThreshold ? .red : .white
+    }
+
+    private var headingLabel: String {
+        let dirs = ["N","NE","E","SE","S","SW","W","NW","N"]
+        let index = Int((locationManager.heading + 22.5) / 45) % 8
+        return dirs[index]
     }
 
     var body: some View {
@@ -58,13 +72,26 @@ struct SpeedView: View {
                 VStack(spacing: 8) {
                     Text(String(format: "%.0f", displaySpeed))
                         .font(fontSettings.selectedFont.font(size: 120))
-                        .foregroundColor(.white)
+                        .foregroundColor(speedColor)
                         .contentTransition(.numericText())
                         .animation(.easeInOut(duration: 0.2), value: displaySpeed)
 
                     Text(speedUnitSettings.unit.displayName)
                         .font(.title)
                         .foregroundColor(.gray)
+
+                    // 高度・方位
+                    if locationManager.isTracking {
+                        HStack(spacing: 20) {
+                            Label(String(format: "%.0fm", locationManager.altitude), systemImage: "arrow.up.to.line")
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundColor(.gray)
+                            Label(headingLabel, systemImage: "location.north.line")
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundColor(.gray)
+                        }
+                        .transition(.opacity)
+                    }
                 }
 
                 // ② 速度統計カード（トラッキング中または統計データあり）
@@ -121,6 +148,11 @@ struct SpeedView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: premiumSettings.themeColor)
         .animation(.easeInOut(duration: 0.3), value: locationManager.isTracking)
+        .onChange(of: isOverThreshold) { _, over in
+            if over {
+                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+            }
+        }
     }
 
     @ViewBuilder

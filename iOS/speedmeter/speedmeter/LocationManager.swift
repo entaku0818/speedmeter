@@ -47,6 +47,8 @@ class LocationManager: NSObject, ObservableObject {
     @Published var averageSpeedKmh: Double = 0.0
     @Published var isTracking: Bool = false
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published var altitude: Double = 0.0 // meters
+    @Published var heading: Double = 0.0 // degrees (0=North)
     @Published var simulatedSpeed: SimulatedSpeed = .none {
         didSet {
             updateSimulation()
@@ -60,6 +62,7 @@ class LocationManager: NSObject, ObservableObject {
         locationManager.distanceFilter = 1
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.pausesLocationUpdatesAutomatically = false
+        locationManager.headingFilter = 5
     }
 
     func requestPermission() {
@@ -68,6 +71,7 @@ class LocationManager: NSObject, ObservableObject {
 
     func startTracking() {
         locationManager.startUpdatingLocation()
+        locationManager.startUpdatingHeading()
         isTracking = true
         // セッション統計をリセット
         maxSpeedKmh = 0.0
@@ -78,6 +82,7 @@ class LocationManager: NSObject, ObservableObject {
 
     func stopTracking() {
         locationManager.stopUpdatingLocation()
+        locationManager.stopUpdatingHeading()
         simulationTimer?.invalidate()
         simulationTimer = nil
         isTracking = false
@@ -120,6 +125,7 @@ extension LocationManager: CLLocationManagerDelegate {
             speedKmh = speed * 3.6
             updateSpeedStats(speedKmh)
         }
+        altitude = location.altitude
 
         let now = Date()
         if lastRecordTime == nil || now.timeIntervalSince(lastRecordTime!) >= recordInterval {
@@ -129,6 +135,10 @@ extension LocationManager: CLLocationManagerDelegate {
                 LocationHistoryStore.shared.addRecord(record)
             }
         }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        heading = newHeading.magneticHeading
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

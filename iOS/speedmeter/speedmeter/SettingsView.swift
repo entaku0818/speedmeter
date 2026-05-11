@@ -74,6 +74,7 @@ class FontSettings: ObservableObject {
 enum SpeedUnit: String, CaseIterable, Identifiable {
     case kmh = "km/h"
     case mph = "mph"
+    case knots = "knots"
 
     var id: String { rawValue }
     var displayName: String { rawValue }
@@ -82,6 +83,7 @@ enum SpeedUnit: String, CaseIterable, Identifiable {
         switch self {
         case .kmh: return kmh
         case .mph: return kmh * 0.621371
+        case .knots: return kmh * 0.539957
         }
     }
 }
@@ -101,6 +103,23 @@ class SpeedUnitSettings: ObservableObject {
     }
 }
 
+class SpeedWarningSettings: ObservableObject {
+    static let shared = SpeedWarningSettings()
+
+    @Published var isEnabled: Bool {
+        didSet { UserDefaults.standard.set(isEnabled, forKey: "speedWarningEnabled") }
+    }
+    @Published var threshold: Double {
+        didSet { UserDefaults.standard.set(threshold, forKey: "speedWarningThreshold") }
+    }
+
+    private init() {
+        isEnabled = UserDefaults.standard.bool(forKey: "speedWarningEnabled")
+        let saved = UserDefaults.standard.double(forKey: "speedWarningThreshold")
+        threshold = saved > 0 ? saved : 60
+    }
+}
+
 struct SettingsView: View {
     @ObservedObject var locationManager: LocationManager
     @ObservedObject private var historyStore = LocationHistoryStore.shared
@@ -108,6 +127,7 @@ struct SettingsView: View {
     @ObservedObject private var purchaseManager = PurchaseManager.shared
     @ObservedObject private var premiumSettings = PremiumSettings.shared
     @ObservedObject private var speedUnitSettings = SpeedUnitSettings.shared
+    @ObservedObject private var warningSettings = SpeedWarningSettings.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showingScreenshotMode = false
     @State private var showingPaywall = false
@@ -182,6 +202,29 @@ struct SettingsView: View {
                         Text("Speed Unit")
                     } footer: {
                         Text("Changes the unit displayed on the speedometer.")
+                    }
+
+                    // Speed Warning Section
+                    Section {
+                        Toggle("Speed Warning", isOn: $warningSettings.isEnabled)
+                        if warningSettings.isEnabled {
+                            HStack {
+                                Text("Threshold")
+                                Spacer()
+                                Text(String(format: "%.0f %@", warningSettings.threshold, speedUnitSettings.unit.displayName))
+                                    .foregroundColor(.secondary)
+                                    .monospacedDigit()
+                            }
+                            Slider(
+                                value: $warningSettings.threshold,
+                                in: 10...200,
+                                step: 5
+                            )
+                        }
+                    } header: {
+                        Text("Speed Warning")
+                    } footer: {
+                        Text("Speed display turns red and vibrates when threshold is exceeded.")
                     }
 
                     Section {
