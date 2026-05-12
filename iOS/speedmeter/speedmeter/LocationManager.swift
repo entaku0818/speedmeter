@@ -32,6 +32,8 @@ enum SimulatedSpeed: String, CaseIterable, Identifiable {
 }
 
 class LocationManager: NSObject, ObservableObject {
+    static let shared = LocationManager()
+
     private let locationManager = CLLocationManager()
     private var lastRecordTime: Date?
     private let recordInterval: TimeInterval = 5.0

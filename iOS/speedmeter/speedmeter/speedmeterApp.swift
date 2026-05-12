@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppIntents
 import GoogleMobileAds
 import RevenueCat
 import FirebaseCore
@@ -32,6 +33,9 @@ struct speedmeterApp: App {
         Task {
             await PurchaseManager.shared.checkPremiumStatus()
         }
+
+        // Siriショートカットを登録
+        SpeedMeterShortcuts.updateAppShortcutParameters()
     }
 
     var body: some Scene {
