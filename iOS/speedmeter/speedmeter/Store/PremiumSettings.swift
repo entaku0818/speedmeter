@@ -9,11 +9,11 @@ import SwiftUI
 import Combine
 
 enum ThemeColor: String, CaseIterable, Identifiable {
-    case black = "black"
-    case darkBlue = "darkBlue"
-    case darkGreen = "darkGreen"
-    case darkRed = "darkRed"
-    case darkPurple = "darkPurple"
+    case black
+    case darkBlue
+    case darkGreen
+    case darkRed
+    case darkPurple
 
     var id: String { rawValue }
 

@@ -366,7 +366,7 @@ struct MockExportContent: View {
         ("48.1 km/h", "14:31:42"),
         ("45.2 km/h", "14:30:58"),
         ("42.0 km/h", "14:30:21"),
-        ("38.5 km/h", "14:29:45"),
+        ("38.5 km/h", "14:29:45")
     ]
 
     var body: some View {
@@ -451,7 +451,7 @@ struct MockMapView: View {
         // 9. 祝田橋交差点
         (35.6765, 139.7610, 42),
         // 10. 馬場先門
-        (35.6810, 139.7640, 35),
+        (35.6810, 139.7640, 35)
     ]
 
     var body: some View {
@@ -726,17 +726,25 @@ struct MockSettingsView: View {
 // MARK: - Mock Location History View
 struct MockLocationHistoryView: View {
     let language: ScreenshotLanguage
-    private let mockRecords: [(speed: Double, lat: Double, lon: Double, altitude: Double, time: String)] = [
-        (52.3, 35.6905, 139.7455, 12, "14:32:15"),
-        (48.1, 35.6940, 139.7510, 15, "14:31:42"),
-        (45.2, 35.6782, 139.7450, 18, "14:30:58"),
-        (42.0, 35.6867, 139.7629, 10, "14:30:21"),
-        (38.5, 35.6740, 139.7580, 8, "14:29:45"),
-        (35.0, 35.6810, 139.7640, 11, "14:29:02"),
-        (25.3, 35.6755, 139.7505, 14, "14:28:18"),
-        (18.7, 35.6832, 139.7410, 16, "14:27:35"),
-        (15.2, 35.6912, 139.7576, 13, "14:26:52"),
-        (42.8, 35.6765, 139.7610, 9, "14:26:08"),
+    private struct MockRecord {
+        let speed: Double
+        let lat: Double
+        let lon: Double
+        let altitude: Double
+        let time: String
+    }
+
+    private let mockRecords: [MockRecord] = [
+        MockRecord(speed: 52.3, lat: 35.6905, lon: 139.7455, altitude: 12, time: "14:32:15"),
+        MockRecord(speed: 48.1, lat: 35.6940, lon: 139.7510, altitude: 15, time: "14:31:42"),
+        MockRecord(speed: 45.2, lat: 35.6782, lon: 139.7450, altitude: 18, time: "14:30:58"),
+        MockRecord(speed: 42.0, lat: 35.6867, lon: 139.7629, altitude: 10, time: "14:30:21"),
+        MockRecord(speed: 38.5, lat: 35.6740, lon: 139.7580, altitude: 8, time: "14:29:45"),
+        MockRecord(speed: 35.0, lat: 35.6810, lon: 139.7640, altitude: 11, time: "14:29:02"),
+        MockRecord(speed: 25.3, lat: 35.6755, lon: 139.7505, altitude: 14, time: "14:28:18"),
+        MockRecord(speed: 18.7, lat: 35.6832, lon: 139.7410, altitude: 16, time: "14:27:35"),
+        MockRecord(speed: 15.2, lat: 35.6912, lon: 139.7576, altitude: 13, time: "14:26:52"),
+        MockRecord(speed: 42.8, lat: 35.6765, lon: 139.7610, altitude: 9, time: "14:26:08")
     ]
 
     var body: some View {

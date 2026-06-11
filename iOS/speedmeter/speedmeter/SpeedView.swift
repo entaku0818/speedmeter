@@ -43,7 +43,7 @@ struct SpeedView: View {
     }
 
     private var headingLabel: String {
-        let dirs = ["N","NE","E","SE","S","SW","W","NW","N"]
+        let dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"]
         let index = Int((locationManager.heading + 22.5) / 45) % 8
         return dirs[index]
     }
@@ -120,7 +120,7 @@ struct SpeedView: View {
                 VStack(spacing: 16) {
                     statusView
 
-                    Button(action: {
+                    Button {
                         if locationManager.isTracking {
                             locationManager.stopTracking()
                         } else {
@@ -130,7 +130,7 @@ struct SpeedView: View {
                                 locationManager.startTracking()
                             }
                         }
-                    }) {
+                    } label: {
                         Text(locationManager.isTracking ? "Stop" : "Start")
                             .font(.title2)
                             .fontWeight(.semibold)

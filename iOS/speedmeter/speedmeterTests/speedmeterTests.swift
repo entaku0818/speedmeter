@@ -76,7 +76,7 @@ struct MapFilteringTests {
             createRecord(lat: 35.6812, lon: 139.7671),  // 東京駅
             createRecord(lat: 35.6895, lon: 139.6917),  // 新宿
             createRecord(lat: 35.7100, lon: 139.8107),  // 上野
-            createRecord(lat: 35.6580, lon: 139.7016),  // 渋谷
+            createRecord(lat: 35.6580, lon: 139.7016)  // 渋谷
         ]
 
         // 東京駅を中心とした狭い領域
@@ -115,7 +115,7 @@ struct MapFilteringTests {
 
     @Test func filterRecordsEmptyWhenOutsideRegion() async throws {
         let records = [
-            createRecord(lat: 35.6812, lon: 139.7671),  // 東京
+            createRecord(lat: 35.6812, lon: 139.7671)  // 東京
         ]
 
         // 大阪を中心とした領域
