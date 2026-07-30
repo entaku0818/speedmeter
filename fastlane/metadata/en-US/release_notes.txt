@@ -1,3 +1,2 @@
-• Speed Warning: display turns red and vibrates when your set speed threshold is exceeded
-• Altitude & Compass: shows current elevation and heading direction while tracking
-• Knots unit support: now supports knots for marine and aviation use
+• Refreshed the App Store screenshots
+• Minor internal improvements and maintenance

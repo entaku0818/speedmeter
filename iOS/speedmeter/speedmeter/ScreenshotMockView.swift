@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import UIKit
 
 // MARK: - Screenshot Language
 enum ScreenshotLanguage: String, CaseIterable {
@@ -61,36 +62,201 @@ enum ScreenshotLanguage: String, CaseIterable {
     var avgSpeed: String { self == .english ? "Avg" : "平均速度" }
     var distance: String { self == .english ? "Distance" : "走行距離" }
     var todayTrip: String { self == .english ? "Today's Trip" : "今日の走行" }
+    var heading: String { self == .english ? "NE" : "NE" }
 }
 
-// MARK: - App Store Screenshot Wrapper
-struct AppStoreScreenshotWrapper<Content: View>: View {
-    let caption: String
-    @ViewBuilder let content: () -> Content
+// MARK: - Device Mockup Metrics
+/// スクリーンショット用の端末フレーム寸法。App Store 提出サイズごとに切り替える。
+struct DeviceMockMetrics {
+    let canvasWidth: CGFloat      // スクリーンショット全体の論理サイズ
+    let canvasHeight: CGFloat
+    let deviceWidth: CGFloat      // 端末モックの論理サイズ
+    let deviceHeight: CGFloat
+    let bezelWidth: CGFloat
+    let cornerRadius: CGFloat
+    let statusBarHeight: CGFloat
+    let statusBarFontSize: CGFloat
+    let statusBarPaddingH: CGFloat
+    let hasDynamicIsland: Bool    // iPad Pro (6th gen) はノッチなし
+    let homeIndicatorWidth: CGFloat
+    let captionFontSize: CGFloat
+    let captionHeight: CGFloat
+    let captionTopSpacing: CGFloat
+    let captionBottomSpacing: CGFloat
+    let mockScale: CGFloat
+
+    /// iPhone 6.7" (1290x2796 @3x)
+    static let iPhone67 = DeviceMockMetrics(
+        canvasWidth: 430, canvasHeight: 932,
+        deviceWidth: 430, deviceHeight: 932,
+        bezelWidth: 14, cornerRadius: 60,
+        statusBarHeight: 50, statusBarFontSize: 15, statusBarPaddingH: 28,
+        hasDynamicIsland: true, homeIndicatorWidth: 140,
+        captionFontSize: 30, captionHeight: 92,
+        captionTopSpacing: 44, captionBottomSpacing: 28,
+        mockScale: 0.78
+    )
+
+    /// iPad Pro 12.9" (2048x2732 @2x)
+    static let iPadPro129 = DeviceMockMetrics(
+        canvasWidth: 1024, canvasHeight: 1366,
+        deviceWidth: 1024, deviceHeight: 1366,
+        bezelWidth: 22, cornerRadius: 46,
+        statusBarHeight: 44, statusBarFontSize: 17, statusBarPaddingH: 36,
+        hasDynamicIsland: false, homeIndicatorWidth: 250,
+        captionFontSize: 52, captionHeight: 150,
+        captionTopSpacing: 56, captionBottomSpacing: 40,
+        mockScale: 0.74
+    )
+
+    /// 実行中の端末に応じたメトリクスを返す
+    static var current: DeviceMockMetrics {
+        UIDevice.current.userInterfaceIdiom == .pad ? .iPadPro129 : .iPhone67
+    }
+}
+
+// MARK: - Device Mockup Frame (bezel + Dynamic Island/camera + home indicator)
+struct DeviceMockupView<Content: View>: View {
+    let metrics: DeviceMockMetrics
+    @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(spacing: 0) {
-            Text(caption)
-                .font(.system(size: 34, weight: .bold))
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .minimumScaleFactor(0.75)
-                .foregroundColor(.white)
-                .padding(.horizontal, 28)
-                .padding(.top, 52)
-                .padding(.bottom, 24)
-                .frame(maxWidth: .infinity)
-                .background(Color.black)
+        let innerWidth = metrics.deviceWidth - metrics.bezelWidth * 2
+        let innerHeight = metrics.deviceHeight - metrics.bezelWidth * 2
+        let innerCorner = metrics.cornerRadius - metrics.bezelWidth
 
-            Rectangle()
-                .fill(Color.green.opacity(0.7))
-                .frame(height: 2)
+        ZStack {
+            RoundedRectangle(cornerRadius: metrics.cornerRadius)
+                .fill(Color(red: 0.05, green: 0.05, blue: 0.06))
+                .overlay(
+                    RoundedRectangle(cornerRadius: metrics.cornerRadius)
+                        .stroke(
+                            LinearGradient(
+                                colors: [Color.white.opacity(0.4), Color.white.opacity(0.05)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
+                )
 
-            content()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: 0) {
+                fakeStatusBar
+                    .frame(height: metrics.statusBarHeight)
+                content
+                    .frame(width: innerWidth, height: innerHeight - metrics.statusBarHeight)
+                    .clipped()
+            }
+            .frame(width: innerWidth, height: innerHeight)
+            .clipShape(RoundedRectangle(cornerRadius: innerCorner))
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: metrics.deviceWidth, height: metrics.deviceHeight)
+        .overlay(alignment: .top) {
+            if metrics.hasDynamicIsland {
+                Capsule()
+                    .fill(Color.black)
+                    .overlay(
+                        Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
+                    .frame(width: 126, height: 37)
+                    .padding(.top, metrics.bezelWidth + 12)
+            } else {
+                // iPad: ベゼル上部のフロントカメラ
+                Circle()
+                    .fill(Color(red: 0.12, green: 0.12, blue: 0.14))
+                    .frame(width: 8, height: 8)
+                    .padding(.top, (metrics.bezelWidth - 8) / 2)
+            }
+        }
+        .overlay(alignment: .bottom) {
+            Capsule()
+                .fill(Color.white.opacity(0.7))
+                .frame(width: metrics.homeIndicatorWidth, height: 5)
+                .padding(.bottom, metrics.bezelWidth + 10)
+        }
+        .overlay(alignment: .leading) {
+            // 音量ボタン・サイレントスイッチ
+            VStack(spacing: 22) {
+                Capsule().fill(Color(red: 0.05, green: 0.05, blue: 0.06)).frame(width: 4, height: 24)
+                Capsule().fill(Color(red: 0.05, green: 0.05, blue: 0.06)).frame(width: 4, height: 52)
+                Capsule().fill(Color(red: 0.05, green: 0.05, blue: 0.06)).frame(width: 4, height: 52)
+            }
+            .padding(.leading, -2)
+            .padding(.top, 140)
+        }
+        .overlay(alignment: .trailing) {
+            // サイドボタン
+            Capsule()
+                .fill(Color(red: 0.05, green: 0.05, blue: 0.06))
+                .frame(width: 4, height: 88)
+                .padding(.trailing, -2)
+                .padding(.top, 160)
+        }
+    }
+
+    private var fakeStatusBar: some View {
+        HStack {
+            Text("9:41")
+                .font(.system(size: metrics.statusBarFontSize, weight: .semibold))
+            Spacer()
+            HStack(spacing: 5) {
+                Image(systemName: "cellularbars")
+                Image(systemName: "wifi")
+                Image(systemName: "battery.100percent")
+            }
+            .font(.system(size: metrics.statusBarFontSize - 2))
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, metrics.statusBarPaddingH)
+        .padding(.top, 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.black)
+    }
+}
+
+// MARK: - App Store Screenshot Frame (caption + background + device mockup)
+struct AppStoreScreenshotFrame<Content: View>: View {
+    let caption: String
+    @ViewBuilder let content: Content
+
+    private let metrics = DeviceMockMetrics.current
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color(red: 0.04, green: 0.05, blue: 0.10), Color(red: 0.11, green: 0.05, blue: 0.17)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                Spacer(minLength: metrics.captionTopSpacing)
+
+                Text(caption)
+                    .font(.system(size: metrics.captionFontSize, weight: .bold))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 32)
+                    .frame(height: metrics.captionHeight)
+
+                Spacer(minLength: metrics.captionBottomSpacing)
+
+                DeviceMockupView(metrics: metrics) { content }
+                    .shadow(color: .black.opacity(0.5), radius: 30, y: 20)
+                    .scaleEffect(metrics.mockScale)
+                    .frame(
+                        width: metrics.deviceWidth * metrics.mockScale,
+                        height: metrics.deviceHeight * metrics.mockScale
+                    )
+
+                Spacer(minLength: 20)
+            }
+        }
+        .frame(width: metrics.canvasWidth, height: metrics.canvasHeight)
+        .statusBarHidden()
     }
 }
 
@@ -106,23 +272,23 @@ struct ScreenshotMockView: View {
             ZStack {
                 switch currentScreen {
                 case 0:
-                    AppStoreScreenshotWrapper(caption: language.captionSpeed) {
+                    AppStoreScreenshotFrame(caption: language.captionSpeed) {
                         MockSpeedContent(language: language)
                     }
                 case 1:
-                    AppStoreScreenshotWrapper(caption: language.captionStats) {
+                    AppStoreScreenshotFrame(caption: language.captionStats) {
                         MockStatsContent(language: language)
                     }
                 case 2:
-                    AppStoreScreenshotWrapper(caption: language.captionMap) {
+                    AppStoreScreenshotFrame(caption: language.captionMap) {
                         MockMapView(language: language)
                     }
                 case 3:
-                    AppStoreScreenshotWrapper(caption: language.captionExport) {
+                    AppStoreScreenshotFrame(caption: language.captionExport) {
                         MockExportContent(language: language)
                     }
                 default:
-                    AppStoreScreenshotWrapper(caption: language.captionSpeed) {
+                    AppStoreScreenshotFrame(caption: language.captionSpeed) {
                         MockSpeedContent(language: language)
                     }
                 }
@@ -191,11 +357,8 @@ struct MockSpeedContent: View {
             Color.black
 
             VStack(spacing: 0) {
-                // Status bar
+                // Settings button (実際のSpeedViewと同じレイアウト。時刻はOSのステータスバーに任せる)
                 HStack {
-                    Text("9:41")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.white)
                     Spacer()
                     Image(systemName: "gearshape.fill")
                         .font(.title3)
@@ -207,13 +370,23 @@ struct MockSpeedContent: View {
                 Spacer()
 
                 // Main speed display
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
                     Text("87")
                         .font(.system(size: 130, weight: .bold, design: .monospaced))
                         .foregroundColor(.white)
                     Text(language.kmh)
                         .font(.title)
                         .foregroundColor(.gray)
+
+                    // 高度・方位（v1.3で追加）
+                    HStack(spacing: 20) {
+                        Label("142m", systemImage: "arrow.up.to.line")
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundColor(.gray)
+                        Label(language.heading, systemImage: "location.north.line")
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundColor(.gray)
+                    }
                 }
 
                 Spacer()
