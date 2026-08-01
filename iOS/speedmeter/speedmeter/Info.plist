@@ -17,9 +17,9 @@
 	<key>CFBundleDisplayName</key>
 	<string>Speedmeter</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app uses your location to display your current speed.</string>
+	<string>Speedmeter reads your GPS location to calculate how fast you are moving and shows it as a large speedometer reading, together with your current altitude and compass heading. For example, while you are cycling it displays 25 km/h on screen, tracks the highest and average speed of the ride, and can alert you when you go over a speed limit you set. Everything is calculated on your device, and your location history is only stored locally unless you choose to export it yourself.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app uses your location to display your current speed, even in the background.</string>
+	<string>Speedmeter reads your GPS location to calculate your speed, altitude and compass heading, and keeps doing so while the app is in the background or your screen is locked. For example, if you put your phone down during a drive, Speedmeter keeps recording your speed and route so the trip summary still shows your correct top speed, average speed and distance when you come back. This history is stored only on your device unless you choose to export it yourself as CSV or GPX.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
@@ -31,7 +31,7 @@
 	<key>RevenueCatAPIKey</key>
 	<string>$(REVENUECAT_API_KEY)</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads to you.</string>
+	<string>Speedmeter shows banner ads in the free version. If you allow tracking, your device advertising identifier is shared with our ad provider (Google AdMob) so those banners can be matched to your interests - for example showing cycling or car accessory ads instead of unrelated ones. If you do not allow it you will still see the same number of ads, they will just be less relevant, and you can remove ads entirely with the Pro upgrade.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
