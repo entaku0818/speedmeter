@@ -338,6 +338,24 @@ struct SettingsView: View {
                         }
                     }
 
+                    // 広告の同意設定（EEA等、UMPが要求する地域でのみ表示）
+                    if AdConsentManager.shared.isPrivacyOptionsRequired {
+                        Section {
+                            Button {
+                                Task { await AdConsentManager.shared.presentPrivacyOptionsForm() }
+                            } label: {
+                                HStack {
+                                    Image(systemName: "hand.raised")
+                                    Text("Privacy Options")
+                                }
+                            }
+                        } header: {
+                            Text("Privacy")
+                        } footer: {
+                            Text("Change your consent for personalized ads")
+                        }
+                    }
+
                     #if DEBUG
                     Section {
                         ForEach(SimulatedSpeed.allCases) { speed in
