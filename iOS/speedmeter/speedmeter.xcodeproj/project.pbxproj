@@ -42,6 +42,8 @@
 		612A20C02F01849000818755 /* Exceptions for "speedmeter" folder in "speedmeter" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Config/Debug.xcconfig,
+				Config/Release.xcconfig,
 				Info.plist,
 			);
 			target = 613BE0C32EED2A4000B60D97 /* speedmeter */;

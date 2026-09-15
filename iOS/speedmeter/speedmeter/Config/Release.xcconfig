@@ -3,9 +3,7 @@
 
 ADMOB_APP_ID = ca-app-pub-3484697221349891~3312246314
 ADMOB_BANNER_ID = ca-app-pub-3484697221349891/3499130339
-// TODO: AdMob管理画面で「アプリ起動 (App Open)」の広告ユニットを発行し、そのIDをここに入れる。
-// 空のあいだ AppOpenAdManager は完全に無効（ロードもリクエストもしない）。
-ADMOB_APPOPEN_ID =
+ADMOB_APPOPEN_ID = ca-app-pub-3484697221349891/9775794492
 
 // RevenueCat API Key
 REVENUECAT_API_KEY = appl_kxOZwVEsMNnblamApxudwAMNply

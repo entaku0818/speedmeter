@@ -26,13 +26,29 @@ struct AppOpenAdGateTests {
         #expect(AppOpenAdManager.shouldShow(atLaunchCount: 5, everyN: 0) == false)
     }
 
-    /// 本番のユニットIDが未設定なら App Open 広告は完全に無効になること。
+    /// isConfigured が Info.plist の値と一致すること（未設定なら完全に無効）。
     @MainActor
-    @Test func disabledWhenAdUnitIDIsMissing() async throws {
-        // Debug構成ではGoogleのテストIDが入っているので有効になる。
-        // ここではフラグがInfo.plistの値と一致していることだけを確認する。
-        let configuredID = (Bundle.main.object(forInfoDictionaryKey: "AdMobAppOpenID") as? String ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        #expect(AppOpenAdManager.shared.isConfigured == !configuredID.isEmpty)
+    @Test func isConfiguredMatchesInfoPlist() async throws {
+        #expect(AppOpenAdManager.shared.isConfigured == !Self.configuredAdUnitID.isEmpty)
+    }
+
+    /// ビルド構成に対応した広告ユニットIDが実際に埋め込まれていること。
+    /// Release では本番IDが入り、Googleのテスト用publisher IDが残っていてはいけない。
+    @MainActor
+    @Test func adUnitIDMatchesBuildConfiguration() async throws {
+        let unitID = Self.configuredAdUnitID
+        #expect(AppOpenAdManager.shared.isConfigured == true)
+
+        #if DEBUG
+        #expect(unitID == "ca-app-pub-3940256099942544/5575463023")
+        #else
+        #expect(unitID == "ca-app-pub-3484697221349891/9775794492")
+        #expect(unitID.contains("3940256099942544") == false)
+        #endif
+    }
+
+    private static var configuredAdUnitID: String {
+        let value = Bundle.main.object(forInfoDictionaryKey: "AdMobAppOpenID") as? String
+        return (value ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
