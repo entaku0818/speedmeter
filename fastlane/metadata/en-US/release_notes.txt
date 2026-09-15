@@ -1,2 +1,3 @@
-• Refreshed the App Store screenshots
-• Minor internal improvements and maintenance
+• You can now change your ad privacy options from Settings
+• Internal improvements to ad delivery
+• Minor bug fixes and maintenance
