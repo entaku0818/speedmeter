@@ -4,15 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Commands
 
+Xcode 27.0 (27A266a) / iOS 27.0 Simulator が動作確認済みのバージョン。
+デフォルトの `xcode-select` が別バージョンの場合は `DEVELOPER_DIR` を前置する。
+
 ```bash
 # Build the project
 xcodebuild -project iOS/speedmeter/speedmeter.xcodeproj -scheme speedmeter -configuration Debug build
 
 # Run tests
-xcodebuild -project iOS/speedmeter/speedmeter.xcodeproj -scheme speedmeter test -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild -project iOS/speedmeter/speedmeter.xcodeproj -scheme speedmeter test -destination 'platform=iOS Simulator,name=iPhone 18 Pro'
 
 # Run a single test
-xcodebuild -project iOS/speedmeter/speedmeter.xcodeproj -scheme speedmeter test -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:speedmeterTests/speedmeterTests/testSpeedConversion
+xcodebuild -project iOS/speedmeter/speedmeter.xcodeproj -scheme speedmeter test -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -only-testing:speedmeterTests/speedmeterTests/testSpeedConversion
+
+# Xcode 27 を明示して実行する場合
+DEVELOPER_DIR=/Applications/Xcode-27.0.0.app/Contents/Developer \
+  xcodebuild -project iOS/speedmeter/speedmeter.xcodeproj -scheme speedmeter -configuration Debug build
 ```
 
 ## Architecture

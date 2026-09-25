@@ -207,8 +207,8 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2610;
-				LastUpgradeCheck = 2610;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					613BE0C32EED2A4000B60D97 = {
 						CreatedOnToolsVersion = 26.1;
@@ -684,7 +684,7 @@
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.52.0;
+				minimumVersion = 5.91.0;
 			};
 		};
 		612A27752F03F2D300818755 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
