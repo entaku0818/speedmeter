@@ -29,7 +29,7 @@ jobs:
     runs-on: [self-hosted, macOS, xcode27]
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Prepare simulator
         run: |
@@ -62,8 +62,18 @@ jobs:
 
       - name: Upload xcresult
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: TestResults-xcresult
           path: ${{ runner.temp }}/TestResults.xcresult
           if-no-files-found: ignore
+
+      # Self-hosted runner disk is limited: always remove this job's build outputs.
+      # Runs after the xcresult upload. Keeps the CI simulator (reused next run) and the shared SPM cache.
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf "$RUNNER_TEMP/DerivedData" "$RUNNER_TEMP"/*.xcresult
+          if [ -n "$SIM_UDID" ]; then
+            xcrun simctl shutdown "$SIM_UDID" 2>/dev/null || true
+          fi
