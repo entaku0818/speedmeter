@@ -22,6 +22,13 @@ DEVELOPER_DIR=/Applications/Xcode-27.0.0.app/Contents/Developer \
   xcodebuild -project iOS/speedmeter/speedmeter.xcodeproj -scheme speedmeter -configuration Debug build
 ```
 
+## CI
+
+- iOS の build/test は GitHub Actions の **self-hosted runner**（`.github/workflows/ios-ci.yml`, labels `self-hosted, macOS, xcode27`）で実行する
+- GitHub-hosted の `macos-*` ランナーは課金のため禁止。iOS ジョブは self-hosted（ios-ci.yml）のみ可
+- Xcode Cloud は使わない
+- シミュレータはリポジトリ専用の `CI-speedmeter`（iPhone 18 Pro / iOS 27.0）。フォーク PR では実行しない
+
 ## Architecture
 
 This is a SwiftUI iOS app that displays real-time GPS speed with a digital clock-style display.
