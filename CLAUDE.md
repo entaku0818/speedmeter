@@ -89,7 +89,7 @@ xcodebuild archive \
 xcodebuild -exportArchive \
   -archivePath build/speedmeter.xcarchive \
   -exportPath build/export \
-  -exportOptionsPlist build/AppStoreExportOptions.plist \
+  -exportOptionsPlist AppStoreExportOptions.plist \
   -allowProvisioningUpdates
 
 # 5. Upload to App Store Connect
